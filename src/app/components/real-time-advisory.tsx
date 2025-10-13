@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { getRealTimePersonalizedAdvice, type RealTimePersonalizedAdviceOutput } from '@/ai/flows/real-time-personalized-advice';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Droplets, Sprout, ShoppingCart, Loader2, ThumbsUp, ThumbsDown, CheckCircle } from 'lucide-react';
+import { Droplets, Sprout, ShoppingCart, Loader2, ThumbsUp, ThumbsDown, CheckCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import type { FarmerProfileData } from '@/app/page';
 
 export type AdvisoryItem = {
   id: keyof RealTimePersonalizedAdviceOutput;
@@ -18,10 +19,11 @@ export type AdvisoryItem = {
 
 type RealTimeAdvisoryProps = {
   setAdvisoryItems: (items: AdvisoryItem[] | null) => void;
+  farmerProfile: FarmerProfileData | null;
 };
 
 
-export default function RealTimeAdvisory({ setAdvisoryItems }: RealTimeAdvisoryProps) {
+export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: RealTimeAdvisoryProps) {
   const [loading, setLoading] = useState(false);
   const [advisory, setAdvisory] = useState<AdvisoryItem[] | null>(null);
   const { toast } = useToast();
@@ -32,14 +34,24 @@ export default function RealTimeAdvisory({ setAdvisoryItems }: RealTimeAdvisoryP
   }
 
   const fetchAdvice = async () => {
+    if (!farmerProfile) {
+        toast({
+            variant: 'destructive',
+            title: 'Profile Incomplete',
+            description: 'Please fill out your farm profile to get personalized advice.',
+        });
+        return;
+    }
+    
     setLoading(true);
     updateParentState(null);
     try {
       const result = await getRealTimePersonalizedAdvice({
-        location: 'Nashik, Maharashtra',
-        cropType: 'Grapes',
-        area: 10,
-        farmingMethods: 'Organic',
+        location: farmerProfile.location,
+        cropType: farmerProfile.cropType,
+        area: farmerProfile.area,
+        farmingMethods: farmerProfile.farmingMethods,
+        // These can be dynamic later
         weatherConditions: 'Sunny, 32°C, Humidity 45%',
         soilHealthCardData: 'pH: 6.8, N: High, P: Medium, K: High',
         agriStackData: 'Standard regional data applied.',
@@ -98,8 +110,14 @@ export default function RealTimeAdvisory({ setAdvisoryItems }: RealTimeAdvisoryP
           </div>
         )}
         {!loading && !advisory && (
-            <div className="text-center py-10">
-                <p className="text-muted-foreground">Click "Get Advice" to generate your daily tasks.</p>
+             <div className="text-center py-10 text-muted-foreground bg-secondary/50 rounded-lg">
+                <Info className="mx-auto h-8 w-8 mb-2"/>
+                <p className="font-semibold">
+                    {farmerProfile ? 'Ready for your daily tasks?' : 'Complete Your Profile'}
+                </p>
+                <p className="text-sm">
+                    {farmerProfile ? 'Click "Get Advice" to generate your personalized action plan.' : 'Fill out the "My Farm Profile" card to receive AI-powered advice.'}
+                </p>
             </div>
         )}
         {advisory && (
