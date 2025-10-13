@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "farm-dashboard-hero",
+      "description": "A vibrant green farm field under a clear blue sky, used as a hero image for the dashboard.",
+      "imageUrl": "https://picsum.photos/seed/101/1200/400",
+      "imageHint": "farm field"
+    },
+    {
+      "id": "crop-analysis-leaf",
+      "description": "A close-up of a plant leaf with some spots, for use in the photo analysis tool.",
+      "imageUrl": "https://picsum.photos/seed/102/600/600",
+      "imageHint": "plant leaf"
+    },
+    {
+      "id": "farmer-avatar-1",
+      "description": "Avatar for a sample farmer.",
+      "imageUrl": "https://picsum.photos/seed/103/100/100",
+      "imageHint": "farmer portrait"
+    },
+    {
+      "id": "farmer-avatar-2",
+      "description": "Avatar for another sample farmer.",
+      "imageUrl": "https://picsum.photos/seed/104/100/100",
+      "imageHint": "farmer portrait"
+    }
+  ]
 }
