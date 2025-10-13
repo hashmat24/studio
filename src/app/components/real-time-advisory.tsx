@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Droplets, Sprout, ShoppingCart, Loader2, ThumbsUp, ThumbsDown, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-type AdvisoryItem = {
+export type AdvisoryItem = {
   id: keyof RealTimePersonalizedAdviceOutput;
   title: string;
   icon: React.ElementType;
@@ -16,14 +16,24 @@ type AdvisoryItem = {
   feedback: 'good' | 'bad' | null;
 };
 
-export default function RealTimeAdvisory() {
+type RealTimeAdvisoryProps = {
+  setAdvisoryItems: (items: AdvisoryItem[] | null) => void;
+};
+
+
+export default function RealTimeAdvisory({ setAdvisoryItems }: RealTimeAdvisoryProps) {
   const [loading, setLoading] = useState(false);
   const [advisory, setAdvisory] = useState<AdvisoryItem[] | null>(null);
   const { toast } = useToast();
 
+  const updateParentState = (items: AdvisoryItem[] | null) => {
+    setAdvisory(items);
+    setAdvisoryItems(items);
+  }
+
   const fetchAdvice = async () => {
     setLoading(true);
-    setAdvisory(null);
+    updateParentState(null);
     try {
       const result = await getRealTimePersonalizedAdvice({
         location: 'Nashik, Maharashtra',
@@ -40,7 +50,7 @@ export default function RealTimeAdvisory() {
         { id: 'fertilizerTimingAdvice', title: 'Fertilizer Timing', icon: Sprout, advice: result.fertilizerTimingAdvice, completed: false, feedback: null },
         { id: 'harvestAlert', title: 'Harvest Alert', icon: ShoppingCart, advice: result.harvestAlert, completed: false, feedback: null },
       ];
-      setAdvisory(newAdvisory);
+      updateParentState(newAdvisory);
     } catch (error) {
       console.error('Failed to get advice:', error);
       toast({
@@ -54,12 +64,14 @@ export default function RealTimeAdvisory() {
   };
 
   const handleComplete = (id: keyof RealTimePersonalizedAdviceOutput) => {
-    setAdvisory(prev => prev && prev.map(item => item.id === id ? { ...item, completed: true } : item));
+    const newAdvisory = advisory && advisory.map(item => item.id === id ? { ...item, completed: true } : item);
+    updateParentState(newAdvisory);
     toast({ title: 'Task Completed!', description: 'Great job staying on top of your farm tasks.' });
   };
   
   const handleFeedback = (id: keyof RealTimePersonalizedAdviceOutput, feedback: 'good' | 'bad') => {
-    setAdvisory(prev => prev && prev.map(item => item.id === id ? { ...item, feedback } : item));
+    const newAdvisory = advisory && advisory.map(item => item.id === id ? { ...item, feedback } : item);
+    updateParentState(newAdvisory);
     toast({ title: 'Feedback Received', description: 'Thank you for helping us improve!' });
   };
 

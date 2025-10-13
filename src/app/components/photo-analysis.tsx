@@ -19,7 +19,12 @@ function fileToDataUri(file: File): Promise<string> {
   });
 }
 
-export default function PhotoAnalysis() {
+type PhotoAnalysisProps = {
+  setAnalysisResult: (result: SmartPhotoAnalysisForCropHealthOutput | null) => void;
+};
+
+
+export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResult }: PhotoAnalysisProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<SmartPhotoAnalysisForCropHealthOutput | null>(null);
@@ -35,6 +40,7 @@ export default function PhotoAnalysis() {
       const dataUri = await fileToDataUri(file);
       setSelectedImage(dataUri);
       setAnalysisResult(null);
+      setParentAnalysisResult(null);
     }
   };
 
@@ -45,11 +51,13 @@ export default function PhotoAnalysis() {
     }
     setLoading(true);
     setAnalysisResult(null);
+    setParentAnalysisResult(null);
     setIsDialogOpen(true);
 
     try {
       const result = await smartPhotoAnalysisForCropHealth({ photoDataUri: selectedImage });
       setAnalysisResult(result);
+      setParentAnalysisResult(result);
     } catch (error) {
       console.error('Failed to analyze photo:', error);
       toast({
@@ -67,6 +75,7 @@ export default function PhotoAnalysis() {
     if (placeholderImage) {
       setSelectedImage(placeholderImage.imageUrl);
       setAnalysisResult(null);
+      setParentAnalysisResult(null);
     }
   };
 

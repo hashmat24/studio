@@ -1,5 +1,10 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sun, CloudRain, AlertTriangle } from 'lucide-react';
+import { Sun, CloudRain, AlertTriangle, Droplets, Sprout, ShoppingCart } from 'lucide-react';
+import type { AdvisoryItem } from './real-time-advisory';
+import type { SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
+import { useEffect, useState } from 'react';
 
 type HealthStatus = 'Good' | 'Attention' | 'Problem';
 
@@ -24,8 +29,24 @@ const HealthIndicator = ({ status, title, icon: Icon, description }: { status: H
   );
 };
 
-export default function HealthDashboard() {
-  const overallHealth: HealthStatus = 'Attention';
+type HealthDashboardProps = {
+  advisoryItems: AdvisoryItem[] | null;
+  analysisResult: SmartPhotoAnalysisForCropHealthOutput | null;
+};
+
+export default function HealthDashboard({ advisoryItems, analysisResult }: HealthDashboardProps) {
+  const [overallHealth, setOverallHealth] = useState<HealthStatus>('Good');
+
+  useEffect(() => {
+    let health: HealthStatus = 'Good';
+    if (analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A') {
+      health = 'Problem';
+    } else if (advisoryItems?.some(item => !item.completed)) {
+      health = 'Attention';
+    }
+    setOverallHealth(health);
+  }, [advisoryItems, analysisResult]);
+
 
   const overallHealthInfo = {
     Good: {
@@ -50,6 +71,11 @@ export default function HealthDashboard() {
 
   const currentHealth = overallHealthInfo[overallHealth];
 
+  const getIndicatorStatus = (item: AdvisoryItem): HealthStatus => {
+    if (item.completed) return 'Good';
+    return 'Attention';
+  }
+
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
@@ -61,9 +87,19 @@ export default function HealthDashboard() {
             <p>{currentHealth.description}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <HealthIndicator status="Good" title="Soil Moisture" icon={Sun} description="Optimal levels detected." />
-          <HealthIndicator status="Attention" title="Weather" icon={CloudRain} description="Light rain expected tomorrow." />
-          <HealthIndicator status="Problem" title="Pest Alert" icon={AlertTriangle} description="Aphids detected in Sector B." />
+          <HealthIndicator status={analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A' ? 'Problem' : 'Good'} title="Pest Alert" icon={AlertTriangle} description={analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A' ? analysisResult.pestOrDisease : 'No pests detected.'} />
+          {advisoryItems ? (
+            <>
+              {advisoryItems.find(i => i.id === 'irrigationAdvice') && <HealthIndicator status={getIndicatorStatus(advisoryItems.find(i => i.id === 'irrigationAdvice')!)} title="Irrigation" icon={Droplets} description={advisoryItems.find(i => i.id === 'irrigationAdvice')?.advice || ''} />}
+              {advisoryItems.find(i => i.id === 'fertilizerTimingAdvice') && <HealthIndicator status={getIndicatorStatus(advisoryItems.find(i => i.id === 'fertilizerTimingAdvice')!)} title="Fertilizer" icon={Sprout} description={advisoryItems.find(i => i.id === 'fertilizerTimingAdvice')?.advice || ''} />}
+            </>
+          ) : (
+            <>
+              <HealthIndicator status="Good" title="Soil Moisture" icon={Sun} description="Optimal levels detected." />
+              <HealthIndicator status="Attention" title="Weather" icon={CloudRain} description="Light rain expected tomorrow." />
+            </>
+          )}
+
         </div>
       </CardContent>
     </Card>
