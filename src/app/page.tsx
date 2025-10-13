@@ -1,15 +1,34 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import DashboardHeader from '@/app/components/dashboard-header';
 import HealthDashboard from '@/app/components/health-dashboard';
 import RealTimeAdvisory, { AdvisoryItem } from '@/app/components/real-time-advisory';
 import PhotoAnalysis from '@/app/components/photo-analysis';
 import MarketPrices from '@/app/components/market-prices';
 import { SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
+import { useUser } from '@/firebase';
+import { Loader2 } from 'lucide-react';
 
 export default function Home() {
     const [advisoryItems, setAdvisoryItems] = useState<AdvisoryItem[] | null>(null);
     const [analysisResult, setAnalysisResult] = useState<SmartPhotoAnalysisForCropHealthOutput | null>(null);
+    const { user, isUserLoading } = useUser();
+    const router = useRouter();
+
+    useEffect(() => {
+      if (!isUserLoading && !user) {
+        router.push('/login');
+      }
+    }, [user, isUserLoading, router]);
+
+    if (isUserLoading || !user) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </div>
+        );
+    }
 
 
   return (

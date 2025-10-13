@@ -1,7 +1,20 @@
+'use client';
+
 import Link from 'next/link';
-import { Leaf } from 'lucide-react';
+import { Leaf, LogOut } from 'lucide-react';
+import { useAuth, useUser } from '@/firebase';
+import { Button } from '../ui/button';
 
 export default function Header() {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+
+  const handleLogout = async () => {
+    if (auth) {
+      await auth.signOut();
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
@@ -26,6 +39,20 @@ export default function Header() {
               Admin Dashboard
             </Link>
           </nav>
+        </div>
+        <div className="flex flex-1 items-center justify-end">
+          {isUserLoading ? (
+            <div className="h-8 w-20 animate-pulse rounded-md bg-muted" />
+          ) : user ? (
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          ) : (
+            <Button asChild variant="default" size="sm">
+              <Link href="/login">Login</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
