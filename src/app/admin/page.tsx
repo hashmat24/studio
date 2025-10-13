@@ -1,8 +1,29 @@
+'use client';
+import { useRouter } from 'next/navigation';
+import { useAdmin } from '@/hooks/use-admin';
+import { Loader2 } from 'lucide-react';
 import SystemStatus from './components/system-status';
 import UserManagement from './components/user-management';
 import AiPerformance from './components/ai-performance';
 
 export default function AdminDashboard() {
+  const { isAdmin, isLoading } = useAdmin();
+  const router = useRouter();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        <p className="ml-4">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    router.push('/');
+    return null; 
+  }
+
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
       <div className="mb-6">
