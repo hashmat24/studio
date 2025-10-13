@@ -5,23 +5,25 @@ import { Loader2 } from 'lucide-react';
 import SystemStatus from './components/system-status';
 import UserManagement from './components/user-management';
 import AiPerformance from './components/ai-performance';
+import { useEffect } from 'react';
 
 export default function AdminDashboard() {
   const { isAdmin, isLoading } = useAdmin();
   const router = useRouter();
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading && !isAdmin) {
+      router.push('/');
+    }
+  }, [isLoading, isAdmin, router]);
+
+  if (isLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
         <p className="ml-4">Verifying access...</p>
       </div>
     );
-  }
-
-  if (!isAdmin) {
-    router.push('/');
-    return null; 
   }
 
   return (
