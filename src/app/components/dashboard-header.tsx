@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 export default function DashboardHeader() {
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState<string | null>(null);
 
   useEffect(() => {
     const currentDate = new Date().toLocaleDateString('en-US', {
