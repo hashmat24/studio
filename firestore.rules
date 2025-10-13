@@ -1,0 +1,154 @@
+/**
+ * @fileoverview Firestore Security Rules for the Krishi Mitra application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for farmer profiles and their associated data (advisories, IoT data).
+ * Administrative privileges are granted based on the existence of an admin profile document in the `roles_admin` collection.
+ *
+ * Data Structure:
+ * - /farmer_profiles/{farmerId}: Farmer profile data, accessible only by the farmer and admins.
+ * - /farmer_profiles/{farmerId}/advisories/{advisoryId}: Advisories for a specific farmer.
+ *   Includes a denormalized 'farmerId' for efficient authorization.
+ * - /farmer_profiles/{farmerId}/iot_data/{iotDataId}: IoT data logs for a specific farmer.
+ *   Includes a denormalized 'farmerId' for efficient authorization.
+ * - /roles_admin/{adminId}: Admin role information. Document existence signifies admin status.
+ *
+ * Key Security Decisions:
+ * - All data is nested under /farmer_profiles/{farmerId} to enforce ownership.
+ * - Denormalization of `farmerId` within subcollections avoids costly `get()` calls.
+ * - The `roles_admin` collection uses document existence to determine admin status.
+ * - Listing of farmer profiles is forbidden to prevent data leakage.
+ *
+ * Denormalization for Authorization:
+ * - The `Advisory` and `IoTDataLog` documents include a denormalized `farmerId` field.
+ *   This allows rules to verify ownership without performing additional `get()` operations.
+ *
+ * Structural Segregation:
+ * - Admin roles are stored in a separate `roles_admin` collection, allowing for
+ *   efficient and secure role-based access control.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Protects the `farmer_profiles` collection.
+     * @path /farmer_profiles/{farmerId}
+     * @allow (create) Authenticated user can create their own profile.
+     * @allow (get) Authenticated user can read their own profile or an admin can read any profile.
+     * @allow (update) Authenticated user can update their own profile or an admin can update any profile.
+     * @allow (delete) Authenticated user can delete their own profile or an admin can delete any profile.
+     * @deny (list) Listing farmer profiles is forbidden to protect user privacy.
+     * @principle Enforces document ownership for writes and admin override.
+     */
+    match /farmer_profiles/{farmerId} {
+      function isOwner(farmerId) {
+        return request.auth != null && request.auth.uid == farmerId;
+      }
+
+      function isAdmin() {
+        return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      function isExistingOwner(farmerId) {
+        return isOwner(farmerId) && resource != null;
+      }
+
+      allow get: if isOwner(farmerId) || isAdmin();
+      allow list: if false;
+      allow create: if isOwner(farmerId) && request.resource.data.id == farmerId;
+      allow update: if isExistingOwner(farmerId) || isAdmin() && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(farmerId) || isAdmin();
+    }
+
+    /**
+     * @description Protects the `advisories` subcollection under a farmer profile.
+     * @path /farmer_profiles/{farmerId}/advisories/{advisoryId}
+     * @allow (create) Authenticated user can create an advisory for their own profile.
+     * @allow (get) Authenticated user can read an advisory for their own profile or an admin can read any advisory.
+     * @allow (update) Authenticated user can update an advisory for their own profile or an admin can update any advisory.
+     * @allow (delete) Authenticated user can delete an advisory for their own profile or an admin can delete any advisory.
+     * @deny (create) Authenticated user cannot create an advisory for another user's profile.
+     * @deny (update) Authenticated user cannot update an advisory for another user's profile.
+     * @deny (delete) Authenticated user cannot delete an advisory for another user's profile.
+     * @principle Enforces document ownership and admin override with denormalized farmerId.
+     */
+    match /farmer_profiles/{farmerId}/advisories/{advisoryId} {
+      function isOwner(farmerId) {
+        return request.auth != null && request.auth.uid == farmerId;
+      }
+
+      function isAdmin() {
+        return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      function isExistingOwner(farmerId) {
+          return isOwner(farmerId) && resource != null;
+      }
+
+      allow get: if isOwner(farmerId) || isAdmin();
+      allow list: if isOwner(farmerId) || isAdmin();
+      allow create: if isOwner(farmerId) && request.resource.data.farmerId == farmerId;
+      allow update: if isExistingOwner(farmerId) || isAdmin();
+      allow delete: if isExistingOwner(farmerId) || isAdmin();
+    }
+
+    /**
+     * @description Protects the `iot_data` subcollection under a farmer profile.
+     * @path /farmer_profiles/{farmerId}/iot_data/{iotDataId}
+     * @allow (create) Authenticated user can create IoT data for their own profile.
+     * @allow (get) Authenticated user can read IoT data for their own profile or an admin can read any IoT data.
+     * @allow (update) Authenticated user can update IoT data for their own profile or an admin can update any IoT data.
+     * @allow (delete) Authenticated user can delete IoT data for their own profile or an admin can delete any IoT data.
+     * @deny (create) Authenticated user cannot create IoT data for another user's profile.
+     * @deny (update) Authenticated user cannot update IoT data for another user's profile.
+     * @deny (delete) Authenticated user cannot delete IoT data for another user's profile.
+     * @principle Enforces document ownership and admin override with denormalized farmerId.
+     */
+    match /farmer_profiles/{farmerId}/iot_data/{iotDataId} {
+      function isOwner(farmerId) {
+        return request.auth != null && request.auth.uid == farmerId;
+      }
+
+      function isAdmin() {
+        return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      }
+
+      function isExistingOwner(farmerId) {
+          return isOwner(farmerId) && resource != null;
+      }
+
+      allow get: if isOwner(farmerId) || isAdmin();
+      allow list: if isOwner(farmerId) || isAdmin();
+      allow create: if isOwner(farmerId) && request.resource.data.farmerId == farmerId;
+      allow update: if isExistingOwner(farmerId) || isAdmin();
+      allow delete: if isExistingOwner(farmerId) || isAdmin();
+    }
+
+    /**
+     * @description Allows reading, creation, updating, and deletion of admin profiles only by themselves.
+     * @path /roles_admin/{adminId}
+     * @allow (create) Admin user can create their own profile.
+     * @allow (get) Admin user can read their own profile.
+     * @allow (update) Admin user can update their own profile.
+     * @allow (delete) Admin user can delete their own profile.
+     * @deny (list) Listing of admin profiles is forbidden.
+     * @principle Enforces admin ownership.
+     */
+    match /roles_admin/{adminId} {
+        function isOwner(adminId) {
+          return request.auth != null && request.auth.uid == adminId;
+        }
+
+        function isExistingOwner(adminId) {
+            return isOwner(adminId) && resource != null;
+        }
+
+        allow get: if isOwner(adminId);
+        allow list: if false;
+        allow create: if isOwner(adminId) && request.resource.data.id == adminId;
+        allow update: if isExistingOwner(adminId) && request.resource.data.id == resource.data.id;
+        allow delete: if isExistingOwner(adminId);
+    }
+  }
+}

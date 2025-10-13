@@ -1,0 +1,253 @@
+{
+  "entities": {
+    "FarmerProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FarmerProfile",
+      "type": "object",
+      "description": "Represents the profile of a farmer using the Krishi Mitra app.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the farmer profile."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "Farmer's phone number."
+        },
+        "location": {
+          "type": "string",
+          "description": "Farmer's location (e.g., GPS coordinates or address)."
+        },
+        "cropType": {
+          "type": "string",
+          "description": "Type of crop the farmer cultivates."
+        },
+        "farmingMethods": {
+          "type": "string",
+          "description": "Farming methods employed by the farmer."
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "description": "Farmer's preferred language for the app."
+        },
+        "area": {
+          "type": "number",
+          "description": "Area of land the farmer cultivates (in acres or hectares)."
+        }
+      },
+      "required": [
+        "id",
+        "phoneNumber",
+        "location",
+        "cropType",
+        "farmingMethods",
+        "preferredLanguage",
+        "area"
+      ]
+    },
+    "Advisory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Advisory",
+      "type": "object",
+      "description": "Represents a piece of advisory provided to a farmer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the advisory."
+        },
+        "farmerId": {
+          "type": "string",
+          "description": "Reference to FarmerProfile. (Relationship: FarmerProfile 1:N Advisory)"
+        },
+        "dateTime": {
+          "type": "string",
+          "description": "Date and time when the advisory was generated.",
+          "format": "date-time"
+        },
+        "content": {
+          "type": "string",
+          "description": "The actual advisory content."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of advisory (e.g., irrigation, fertilizer, harvest)."
+        },
+        "rating": {
+          "type": "number",
+          "description": "Farmer's rating of the advisory (e.g., 1-5 stars)."
+        },
+        "feedback": {
+          "type": "string",
+          "description": "Farmer's feedback on the advisory."
+        }
+      },
+      "required": [
+        "id",
+        "farmerId",
+        "dateTime",
+        "content",
+        "type"
+      ]
+    },
+    "IoTDataLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "IoTDataLog",
+      "type": "object",
+      "description": "Represents a log of IoT sensor data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the IoT data log."
+        },
+        "farmerId": {
+          "type": "string",
+          "description": "Reference to FarmerProfile. (Relationship: FarmerProfile 1:N IoTDataLog)"
+        },
+        "sensorId": {
+          "type": "string",
+          "description": "Identifier of the IoT sensor."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the data reading.",
+          "format": "date-time"
+        },
+        "soilMoisture": {
+          "type": "number",
+          "description": "Soil moisture level."
+        },
+        "pH": {
+          "type": "number",
+          "description": "Soil pH level."
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Soil temperature."
+        }
+      },
+      "required": [
+        "id",
+        "farmerId",
+        "sensorId",
+        "timestamp",
+        "soilMoisture",
+        "pH",
+        "temperature"
+      ]
+    },
+    "AdminProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AdminProfile",
+      "type": "object",
+      "description": "Represents the profile of an admin user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the admin profile."
+        },
+        "name": {
+          "type": "string",
+          "description": "Admin's name."
+        },
+        "email": {
+          "type": "string",
+          "description": "Admin's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "Admin's role (e.g., superadmin, moderator)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "role"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/farmer_profiles/{farmerId}",
+        "definition": {
+          "entityName": "FarmerProfile",
+          "schema": {
+            "$ref": "#/backend/entities/FarmerProfile"
+          },
+          "description": "Stores farmer profile data. Accessible only by the farmer and admins.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier of the farmer."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farmer_profiles/{farmerId}/advisories/{advisoryId}",
+        "definition": {
+          "entityName": "Advisory",
+          "schema": {
+            "$ref": "#/backend/entities/Advisory"
+          },
+          "description": "Stores advisories for a specific farmer. Includes denormalized 'farmerId' for authorization independence.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier of the farmer."
+            },
+            {
+              "name": "advisoryId",
+              "description": "The unique identifier of the advisory."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farmer_profiles/{farmerId}/iot_data/{iotDataId}",
+        "definition": {
+          "entityName": "IoTDataLog",
+          "schema": {
+            "$ref": "#/backend/entities/IoTDataLog"
+          },
+          "description": "Stores IoT data logs for a specific farmer. Includes denormalized 'farmerId' for authorization independence.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier of the farmer."
+            },
+            {
+              "name": "iotDataId",
+              "description": "The unique identifier of the IoT data log."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{adminId}",
+        "definition": {
+          "entityName": "AdminProfile",
+          "schema": {
+            "$ref": "#/backend/entities/AdminProfile"
+          },
+          "description": "Stores admin role information. Existence of a document indicates admin status.",
+          "params": [
+            {
+              "name": "adminId",
+              "description": "The unique identifier of the admin user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the Krishi Mitra application. We leverage path-based ownership for user-specific data and a dedicated collection for admin roles. Denormalization is used to avoid `get()` calls in security rules, supporting atomic operations.\n\n*   **/farmer_profiles/{farmerId}**: Stores farmer profiles, accessible only to the farmer themselves or admins.\n*   **/farmer_profiles/{farmerId}/advisories/{advisoryId}**: Stores advisories specific to a farmer. The `farmerId` is denormalized within each advisory document to ensure authorization independence. This allows for direct querying of advisories based on `farmerId` without needing to access the parent `farmer_profiles` document.\n*   **/farmer_profiles/{farmerId}/iot_data/{iotDataId}**: Stores IoT data logs specific to a farmer. Similar to advisories, the `farmerId` is denormalized within each IoT data log document.\n*   **/roles_admin/{adminId}**: A dedicated collection to store admin roles, using existence over content for efficient security rules. This supports QAPs by enabling secure `list` operations for admin-related data without filtering.\n\nThis structure adheres to the core design principles by:\n\n1.  **Authorization Independence:** Achieved by denormalizing `farmerId` in the `advisories` and `iot_data` subcollections.\n2.  **Clarity of Intent:** The path structure clearly indicates ownership and access rights.\n3.  **DBAC:** Roles are stored in the database (roles_admin collection).\n4.  **QAPs:** Supported by structural segregation (separate collections for different access needs) and the use of existence checks for admin roles.\n5.  **Invariants:** The structure supports the integrity of ownership and facilitates the enforcement of data consistency through security rules."
+  }
+}
