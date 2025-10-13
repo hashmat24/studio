@@ -9,6 +9,7 @@ import MarketPrices from '@/app/components/market-prices';
 import { SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
 import { useUser } from '@/firebase';
 import { Loader2 } from 'lucide-react';
+import CropProfile from './components/crop-profile';
 
 export default function Home() {
     const [advisoryItems, setAdvisoryItems] = useState<AdvisoryItem[] | null>(null);
@@ -40,6 +41,7 @@ export default function Home() {
           <RealTimeAdvisory setAdvisoryItems={setAdvisoryItems} />
         </div>
         <div className="space-y-6">
+          <CropProfile />
           <PhotoAnalysis setAnalysisResult={setAnalysisResult} />
           <MarketPrices />
         </div>

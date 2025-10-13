@@ -28,8 +28,8 @@ export interface UseDocResult<T> {
  * React hook to subscribe to a single Firestore document in real-time.
  * Handles nullable references.
  * 
- * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedTargetRefOrQuery or BAD THINGS WILL HAPPEN
- * use useMemo to memoize it per React guidence.  Also make sure that it's dependencies are stable
+ * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedDocRef or BAD THINGS WILL HAPPEN
+ * use useMemoFirebase to memoize it per React guidence.  Also make sure that it's dependencies are stable
  * references
  *
  *
@@ -48,16 +48,16 @@ export function useDoc<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
-    if (!memoizedDocRef) {
-      setData(null);
+    if (!(memoizedDocRef && (memoizedDocRef as any).__memo)) {
+      if (memoizedDocRef) {
+        console.warn("useDoc was passed a ref that was not memoized with useMemoFirebase. This will cause performance issues.", memoizedDocRef);
+      }
       setIsLoading(false);
-      setError(null);
       return;
     }
 
     setIsLoading(true);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,
