@@ -70,7 +70,7 @@ export default function CropProfile() {
         preferredLanguage: 'en', // Or get it from a form
     };
 
-    setDocumentNonBlocking(profileRef, fullProfileData, { merge: true });
+    setDocumentNonBlocking(profileRef, fullProfileData);
 
     toast({
       title: 'Profile Updated',
