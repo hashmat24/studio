@@ -13,6 +13,7 @@ import { useFirestore, useUser, useDoc, useMemoFirebase } from '@/firebase';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { doc } from 'firebase/firestore';
 import { Loader2, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const profileSchema = z.object({
   cropType: z.string().min(1, { message: 'Crop type is required.' }),
@@ -24,6 +25,7 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function CropProfile() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const firestore = useFirestore();
   const { user } = useUser();
@@ -55,8 +57,8 @@ export default function CropProfile() {
     if (!user || !firestore) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'You must be logged in to update your profile.',
+        title: t('error'),
+        description: t('mustBeLoggedIn'),
       });
       return;
     }
@@ -73,16 +75,16 @@ export default function CropProfile() {
     setDocumentNonBlocking(profileRef, fullProfileData);
 
     toast({
-      title: 'Profile Updated',
-      description: 'Your farm profile has been successfully saved.',
+      title: t('profileUpdated'),
+      description: t('profileUpdatedDesc'),
     });
   };
 
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle className="font-headline text-xl">My Farm Profile</CardTitle>
-        <CardDescription>Manage your farm and crop details here.</CardDescription>
+        <CardTitle className="font-headline text-xl">{t('myFarmProfile')}</CardTitle>
+        <CardDescription>{t('myFarmProfileDesc')}</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -98,9 +100,9 @@ export default function CropProfile() {
               name="cropType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Primary Crop Type</FormLabel>
+                  <FormLabel>{t('primaryCropType')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Grapes, Wheat, Cotton" {...field} />
+                    <Input placeholder={t('cropTypePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,9 +113,9 @@ export default function CropProfile() {
               name="farmingMethods"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Farming Methods</FormLabel>
+                  <FormLabel>{t('farmingMethods')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Organic, Conventional" {...field} />
+                    <Input placeholder={t('farmingMethodsPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,7 +126,7 @@ export default function CropProfile() {
               name="area"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Land Area (in acres)</FormLabel>
+                  <FormLabel>{t('landArea')}</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 10" {...field} />
                   </FormControl>
@@ -137,11 +139,11 @@ export default function CropProfile() {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Farm Location</FormLabel>
+                  <FormLabel>{t('farmLocation')}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input placeholder="Click to select from map..." className="pl-10" {...field} />
+                      <Input placeholder={t('locationPlaceholder')} className="pl-10" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -154,7 +156,7 @@ export default function CropProfile() {
           <CardFooter>
             <Button type="submit" disabled={form.formState.isSubmitting || isLoading} className="w-full">
               {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Save Profile
+              {t('saveProfile')}
             </Button>
           </CardFooter>
         </form>

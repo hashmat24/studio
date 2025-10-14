@@ -4,10 +4,13 @@ import {cn} from '@/lib/utils';
 import {Toaster} from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
-import { I18nProvider } from './i18n-provider.tsx';
+import { I18nProvider } from './i18n-provider';
 
 export const metadata: Metadata = {
-  title: 'Fasal Drishti',
+  title: {
+    template: '%s | Fasal Drishti',
+    default: 'Fasal Drishti',
+  },
   description: 'Smart Crop Advisory System',
 };
 

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const marketData = [
   { crop: 'Grapes', today: 85, yesterday: 82, unit: '₹/kg' },
@@ -21,25 +22,26 @@ const PriceChangeIndicator = ({ today, yesterday }: { today: number; yesterday: 
 };
 
 export default function MarketPrices() {
+  const { t } = useTranslation();
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Market Linkage</CardTitle>
-        <CardDescription>Real-time market prices for your crops.</CardDescription>
+        <CardTitle className="font-headline text-xl">{t('marketLinkage')}</CardTitle>
+        <CardDescription>{t('marketLinkageDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-semibold">Crop</TableHead>
-              <TableHead className="font-semibold text-right">Today</TableHead>
-              <TableHead className="font-semibold text-right">Change</TableHead>
+              <TableHead className="font-semibold">{t('crop')}</TableHead>
+              <TableHead className="font-semibold text-right">{t('today')}</TableHead>
+              <TableHead className="font-semibold text-right">{t('change')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {marketData.map((item) => (
               <TableRow key={item.crop}>
-                <TableCell className="font-medium">{item.crop}</TableCell>
+                <TableCell className="font-medium">{t(item.crop)}</TableCell>
                 <TableCell className="text-right font-semibold">{item.today} {item.unit}</TableCell>
                 <TableCell className="text-right">
                   <PriceChangeIndicator today={item.today} yesterday={item.yesterday} />

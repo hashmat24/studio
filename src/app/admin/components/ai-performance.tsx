@@ -3,6 +3,7 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+import { useTranslation } from 'react-i18next';
 
 const chartData = [
   { model: 'Pest Detection', accuracy: 92 },
@@ -20,11 +21,12 @@ const chartConfig = {
 
 
 export default function AiPerformance() {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-xl">AI/ML Performance Tracking</CardTitle>
-        <CardDescription>Accuracy of core prediction and advisory models.</CardDescription>
+        <CardTitle className="font-headline text-xl">{t('aiPerformance')}</CardTitle>
+        <CardDescription>{t('aiPerformanceDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
@@ -35,7 +37,7 @@ export default function AiPerformance() {
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => value}
+                    tickFormatter={(value) => t(value)}
                 />
                 <YAxis
                     tickFormatter={(value) => `${value}%`}

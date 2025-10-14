@@ -5,6 +5,7 @@ import { Sun, CloudRain, AlertTriangle, Droplets, Sprout, ShoppingCart } from 'l
 import type { AdvisoryItem } from './real-time-advisory';
 import type { SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type HealthStatus = 'Good' | 'Attention' | 'Problem';
 
@@ -35,6 +36,7 @@ type HealthDashboardProps = {
 };
 
 export default function HealthDashboard({ advisoryItems, analysisResult }: HealthDashboardProps) {
+  const { t } = useTranslation();
   const [overallHealth, setOverallHealth] = useState<HealthStatus>('Good');
 
   useEffect(() => {
@@ -52,20 +54,20 @@ export default function HealthDashboard({ advisoryItems, analysisResult }: Healt
     Good: {
       bgColor: 'bg-primary',
       textColor: 'text-primary-foreground',
-      message: 'Excellent!',
-      description: 'Your crops are healthy and thriving.'
+      message: t('healthStatusGood'),
+      description: t('healthStatusGoodDesc')
     },
     Attention: {
       bgColor: 'bg-accent',
       textColor: 'text-accent-foreground',
-      message: 'Attention',
-      description: 'Some areas need your attention. Check advisories below.'
+      message: t('healthStatusAttention'),
+      description: t('healthStatusAttentionDesc')
     },
     Problem: {
       bgColor: 'bg-destructive',
       textColor: 'text-destructive-foreground',
-      message: 'Problem Detected',
-      description: 'Immediate action is required. Review critical alerts.'
+      message: t('healthStatusProblem'),
+      description: t('healthStatusProblemDesc')
     }
   }
 
@@ -79,7 +81,7 @@ export default function HealthDashboard({ advisoryItems, analysisResult }: Healt
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Visual Health Dashboard</CardTitle>
+        <CardTitle className="font-headline text-xl">{t('visualHealthDashboard')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className={`p-6 rounded-lg ${currentHealth.bgColor} ${currentHealth.textColor} text-center mb-6`}>
@@ -87,16 +89,16 @@ export default function HealthDashboard({ advisoryItems, analysisResult }: Healt
             <p>{currentHealth.description}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <HealthIndicator status={analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A' ? 'Problem' : 'Good'} title="Pest Alert" icon={AlertTriangle} description={analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A' ? analysisResult.pestOrDisease : 'No pests detected.'} />
+          <HealthIndicator status={analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A' ? 'Problem' : 'Good'} title={t('pestAlert')} icon={AlertTriangle} description={analysisResult?.pestOrDisease && analysisResult.pestOrDisease !== 'N/A' ? analysisResult.pestOrDisease : t('noPestsDetected')} />
           {advisoryItems ? (
             <>
-              {advisoryItems.find(i => i.id === 'irrigationAdvice') && <HealthIndicator status={getIndicatorStatus(advisoryItems.find(i => i.id === 'irrigationAdvice')!)} title="Irrigation" icon={Droplets} description={advisoryItems.find(i => i.id === 'irrigationAdvice')?.advice || ''} />}
-              {advisoryItems.find(i => i.id === 'fertilizerTimingAdvice') && <HealthIndicator status={getIndicatorStatus(advisoryItems.find(i => i.id === 'fertilizerTimingAdvice')!)} title="Fertilizer" icon={Sprout} description={advisoryItems.find(i => i.id === 'fertilizerTimingAdvice')?.advice || ''} />}
+              {advisoryItems.find(i => i.id === 'irrigationAdvice') && <HealthIndicator status={getIndicatorStatus(advisoryItems.find(i => i.id === 'irrigationAdvice')!)} title={t('irrigation')} icon={Droplets} description={advisoryItems.find(i => i.id === 'irrigationAdvice')?.advice || ''} />}
+              {advisoryItems.find(i => i.id === 'fertilizerTimingAdvice') && <HealthIndicator status={getIndicatorStatus(advisoryItems.find(i => i.id === 'fertilizerTimingAdvice')!)} title={t('fertilizer')} icon={Sprout} description={advisoryItems.find(i => i.id === 'fertilizerTimingAdvice')?.advice || ''} />}
             </>
           ) : (
             <>
-              <HealthIndicator status="Good" title="Soil Moisture" icon={Sun} description="Optimal levels detected." />
-              <HealthIndicator status="Attention" title="Weather" icon={CloudRain} description="Light rain expected tomorrow." />
+              <HealthIndicator status="Good" title={t('soilMoisture')} icon={Sun} description={t('soilMoistureDesc')} />
+              <HealthIndicator status="Attention" title={t('weather')} icon={CloudRain} description={t('weatherDesc')} />
             </>
           )}
 

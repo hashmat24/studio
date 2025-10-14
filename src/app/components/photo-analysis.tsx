@@ -12,6 +12,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from 'react-i18next';
 
 function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -32,6 +33,7 @@ type Message = {
 };
 
 export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResult }: PhotoAnalysisProps) {
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
@@ -57,7 +59,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
 
   const handleAnalyzeClick = async () => {
     if (!selectedImage) {
-      toast({ variant: 'destructive', title: 'No Image', description: 'Please select an image to analyze.' });
+      toast({ variant: 'destructive', title: t('noImage'), description: t('noImageDesc') });
       return;
     }
     setLoadingAnalysis(true);
@@ -73,7 +75,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
       
       const initialBotMessage: Message = {
           role: 'bot',
-          text: `Here is the analysis of your crop:\n\n**Health Assessment:** ${result.healthAssessment}\n**Pest/Disease:** ${result.pestOrDisease}\n**Recommendations:** ${result.treatmentRecommendations}\n\nFeel free to ask me any follow-up questions!`
+          text: `${t('analysisResultText')}\n\n**${t('healthAssessment')}:** ${result.healthAssessment}\n**${t('pestOrDisease')}:** ${result.pestOrDisease}\n**${t('treatmentRecommendations')}:** ${result.treatmentRecommendations}\n\n${t('followUpQuestionPrompt')}`
       };
       setMessages([initialBotMessage]);
 
@@ -81,8 +83,8 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
       console.error('Failed to analyze photo:', error);
       toast({
         variant: 'destructive',
-        title: 'Analysis Failed',
-        description: 'Could not analyze the photo. Please try again.',
+        title: t('analysisFailed'),
+        description: t('analysisFailedDesc'),
       });
       setIsDialogOpen(false);
     } finally {
@@ -108,8 +110,8 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
       console.error('Chatbot error:', error);
       toast({
         variant: 'destructive',
-        title: 'Chatbot Error',
-        description: 'Failed to get a response. Please try again.',
+        title: t('chatbotError'),
+        description: t('chatbotErrorDesc'),
       });
     } finally {
       setLoadingChat(false);
@@ -128,8 +130,8 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Smart Photo Analysis</CardTitle>
-        <CardDescription>Upload a crop image for instant health assessment and advice.</CardDescription>
+        <CardTitle className="font-headline text-xl">{t('smartPhotoAnalysis')}</CardTitle>
+        <CardDescription>{t('smartPhotoAnalysisDesc')}</CardDescription>
       </CardHeader>
       <CardContent className="text-center">
         <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center mb-4 overflow-hidden relative">
@@ -138,7 +140,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
           ) : (
             <div className="text-muted-foreground flex flex-col items-center">
               <Camera className="h-12 w-12" />
-              <p>Image preview</p>
+              <p>{t('imagePreview')}</p>
             </div>
           )}
         </div>
@@ -151,13 +153,13 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
         />
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-            <Camera className="mr-2 h-4 w-4" /> Upload Photo
+            <Camera className="mr-2 h-4 w-4" /> {t('uploadPhoto')}
           </Button>
-          <Button variant="secondary" onClick={handleUseSample}>Use Sample</Button>
+          <Button variant="secondary" onClick={handleUseSample}>{t('useSample')}</Button>
         </div>
         <Button onClick={handleAnalyzeClick} disabled={!selectedImage || loadingAnalysis} className="w-full mt-2">
           {loadingAnalysis && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Analyze Crop Health
+          {t('analyzeCropHealth')}
         </Button>
       </CardContent>
 
@@ -166,9 +168,9 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
           <DialogHeader>
             <DialogTitle className="font-headline text-xl flex items-center gap-2">
               <Microscope className="h-6 w-6 text-primary"/>
-              Crop Analysis Chat
+              {t('cropAnalysisChat')}
             </DialogTitle>
-            <DialogDescription>Review your analysis and ask the AI assistant for more details.</DialogDescription>
+            <DialogDescription>{t('cropAnalysisChatDesc')}</DialogDescription>
           </DialogHeader>
           
           <ScrollArea className="flex-1 p-4 border rounded-md my-4">
@@ -176,11 +178,11 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
               {loadingAnalysis ? (
                 <div className="flex items-center justify-center h-48">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="ml-4">Analyzing...</p>
+                  <p className="ml-4">{t('analyzing')}</p>
                 </div>
               ) : messages.length === 0 ? (
                 <div className="text-center text-muted-foreground py-8">
-                  <p>Your analysis results will appear here.</p>
+                  <p>{t('analysisResultsAppearHere')}</p>
                 </div>
               ) : (
                 messages.map((message, index) => (
@@ -225,7 +227,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask a follow-up question..."
+                placeholder={t('askFollowUpQuestion')}
                 className="flex-1 resize-none"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -237,7 +239,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
               />
               <Button onClick={handleSendMessage} disabled={loadingAnalysis || loadingChat || !input.trim()}>
                 <Send className="h-5 w-5" />
-                <span className="sr-only">Send</span>
+                <span className="sr-only">{t('send')}</span>
               </Button>
             </div>
           </CardFooter>

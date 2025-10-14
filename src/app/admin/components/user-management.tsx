@@ -8,6 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // This matches the structure in docs/backend.json for FarmerProfile
 type FarmerProfile = {
@@ -19,6 +20,7 @@ type FarmerProfile = {
 };
 
 export default function UserManagement() {
+  const { t } = useTranslation();
   const avatarMap = new Map(PlaceHolderImages.map(p => [p.id, p.imageUrl]));
   const firestore = useFirestore();
 
@@ -37,8 +39,8 @@ export default function UserManagement() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Farmer Management</CardTitle>
-        <CardDescription>View and manage farmer accounts and profile data.</CardDescription>
+        <CardTitle className="font-headline text-xl">{t('farmerManagement')}</CardTitle>
+        <CardDescription>{t('farmerManagementDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -49,10 +51,10 @@ export default function UserManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Farmer</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Primary Crop</TableHead>
-                <TableHead className="text-right">Status</TableHead>
+                <TableHead>{t('farmer')}</TableHead>
+                <TableHead>{t('location')}</TableHead>
+                <TableHead>{t('primaryCrop')}</TableHead>
+                <TableHead className="text-right">{t('status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -66,7 +68,7 @@ export default function UserManagement() {
                         <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                       </Avatar>
                       {/* Using a placeholder name if not available */}
-                      <div className="font-medium">{user.name || `Farmer ${user.id.substring(0, 5)}`}</div>
+                      <div className="font-medium">{user.name || `${t('farmer')} ${user.id.substring(0, 5)}`}</div>
                     </div>
                   </TableCell>
                   <TableCell>{user.location || 'N/A'}</TableCell>
@@ -74,7 +76,7 @@ export default function UserManagement() {
                   <TableCell className="text-right">
                     {/* Assuming all fetched users are active for now */}
                     <Badge variant='default' className='bg-primary/80'>
-                      Active
+                      {t('active')}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -84,7 +86,7 @@ export default function UserManagement() {
         )}
         {!isLoading && (!users || users.length === 0) && (
             <div className="text-center py-10 text-muted-foreground">
-                <p>No farmer profiles found.</p>
+                <p>{t('noFarmerProfiles')}</p>
             </div>
         )}
       </CardContent>

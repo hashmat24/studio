@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Droplets, Sprout, ShoppingCart, Loader2, ThumbsUp, ThumbsDown, CheckCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { FarmerProfileData } from '@/app/page';
+import { useTranslation } from 'react-i18next';
 
 export type AdvisoryItem = {
   id: keyof RealTimePersonalizedAdviceOutput;
@@ -24,6 +25,7 @@ type RealTimeAdvisoryProps = {
 
 
 export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: RealTimeAdvisoryProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [advisory, setAdvisory] = useState<AdvisoryItem[] | null>(null);
   const { toast } = useToast();
@@ -37,8 +39,8 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
     if (!farmerProfile) {
         toast({
             variant: 'destructive',
-            title: 'Profile Incomplete',
-            description: 'Please fill out your farm profile to get personalized advice.',
+            title: t('profileIncomplete'),
+            description: t('profileIncompleteDesc'),
         });
         return;
     }
@@ -58,17 +60,17 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
       });
 
       const newAdvisory: AdvisoryItem[] = [
-        { id: 'irrigationAdvice', title: 'Irrigation Advice', icon: Droplets, advice: result.irrigationAdvice, completed: false, feedback: null },
-        { id: 'fertilizerTimingAdvice', title: 'Fertilizer Timing', icon: Sprout, advice: result.fertilizerTimingAdvice, completed: false, feedback: null },
-        { id: 'harvestAlert', title: 'Harvest Alert', icon: ShoppingCart, advice: result.harvestAlert, completed: false, feedback: null },
+        { id: 'irrigationAdvice', title: t('irrigationAdvice'), icon: Droplets, advice: result.irrigationAdvice, completed: false, feedback: null },
+        { id: 'fertilizerTimingAdvice', title: t('fertilizerTiming'), icon: Sprout, advice: result.fertilizerTimingAdvice, completed: false, feedback: null },
+        { id: 'harvestAlert', title: t('harvestAlert'), icon: ShoppingCart, advice: result.harvestAlert, completed: false, feedback: null },
       ];
       updateParentState(newAdvisory);
     } catch (error) {
       console.error('Failed to get advice:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not fetch real-time advisory. Please try again.',
+        title: t('error'),
+        description: t('fetchAdviceError'),
       });
     } finally {
       setLoading(false);
@@ -78,13 +80,13 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
   const handleComplete = (id: keyof RealTimePersonalizedAdviceOutput) => {
     const newAdvisory = advisory && advisory.map(item => item.id === id ? { ...item, completed: true } : item);
     updateParentState(newAdvisory);
-    toast({ title: 'Task Completed!', description: 'Great job staying on top of your farm tasks.' });
+    toast({ title: t('taskCompleted'), description: t('taskCompletedDesc') });
   };
   
   const handleFeedback = (id: keyof RealTimePersonalizedAdviceOutput, feedback: 'good' | 'bad') => {
     const newAdvisory = advisory && advisory.map(item => item.id === id ? { ...item, feedback } : item);
     updateParentState(newAdvisory);
-    toast({ title: 'Feedback Received', description: 'Thank you for helping us improve!' });
+    toast({ title: t('feedbackReceived'), description: t('feedbackReceivedDesc') });
   };
 
 
@@ -93,12 +95,12 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="font-headline text-xl">Real-time Advisory</CardTitle>
-            <CardDescription>Your personalized "Today's Actions" list.</CardDescription>
+            <CardTitle className="font-headline text-xl">{t('realTimeAdvisory')}</CardTitle>
+            <CardDescription>{t('realTimeAdvisoryDesc')}</CardDescription>
           </div>
           <Button onClick={fetchAdvice} disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {advisory ? 'Refresh Advice' : 'Get Advice'}
+            {advisory ? t('refreshAdvice') : t('getAdvice')}
           </Button>
         </div>
       </CardHeader>
@@ -106,17 +108,17 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
         {loading && (
           <div className="flex justify-center items-center py-10">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="ml-4 text-muted-foreground">Generating personalized advice...</p>
+            <p className="ml-4 text-muted-foreground">{t('generatingAdvice')}</p>
           </div>
         )}
         {!loading && !advisory && (
              <div className="text-center py-10 text-muted-foreground bg-secondary/50 rounded-lg">
                 <Info className="mx-auto h-8 w-8 mb-2"/>
                 <p className="font-semibold">
-                    {farmerProfile ? 'Ready for your daily tasks?' : 'Complete Your Profile'}
+                    {farmerProfile ? t('readyForTasks') : t('completeYourProfile')}
                 </p>
                 <p className="text-sm">
-                    {farmerProfile ? 'Click "Get Advice" to generate your personalized action plan.' : 'Fill out the "My Farm Profile" card to receive AI-powered advice.'}
+                    {farmerProfile ? t('getAdvicePrompt') : t('completeProfilePrompt')}
                 </p>
             </div>
         )}
@@ -137,7 +139,7 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
                     <div>
                         {!item.completed && (
                             <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                                <span>Helpful?</span>
+                                <span>{t('helpful')}</span>
                                 <Button variant="ghost" size="icon" className={`h-8 w-8 ${item.feedback === 'good' ? 'text-primary bg-primary/10' : ''}`} onClick={() => handleFeedback(item.id, 'good')}><ThumbsUp className="h-4 w-4" /></Button>
                                 <Button variant="ghost" size="icon" className={`h-8 w-8 ${item.feedback === 'bad' ? 'text-destructive bg-destructive/10' : ''}`} onClick={() => handleFeedback(item.id, 'bad')}><ThumbsDown className="h-4 w-4" /></Button>
                             </div>
@@ -146,10 +148,10 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
                     {item.completed ? (
                       <div className="flex items-center text-primary font-semibold">
                         <CheckCircle className="mr-2 h-5 w-5" />
-                        Completed
+                        {t('completed')}
                       </div>
                     ) : (
-                      <Button size="sm" onClick={() => handleComplete(item.id)}>Mark as Complete</Button>
+                      <Button size="sm" onClick={() => handleComplete(item.id)}>{t('markAsComplete')}</Button>
                     )}
                 </CardFooter>
               </Card>

@@ -1,13 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type Status = 'Operational' | 'Degraded' | 'Offline';
 
 const StatusIndicator = ({ service, status }: { service: string, status: Status }) => {
+  const { t } = useTranslation();
   const statusInfo = {
-    Operational: { icon: CheckCircle2, color: 'text-primary', text: 'Operational' },
-    Degraded: { icon: AlertCircle, color: 'text-accent', text: 'Degraded Performance' },
-    Offline: { icon: XCircle, color: 'text-destructive', text: 'Offline' },
+    Operational: { icon: CheckCircle2, color: 'text-primary', text: t('operational') },
+    Degraded: { icon: AlertCircle, color: 'text-accent', text: t('degraded') },
+    Offline: { icon: XCircle, color: 'text-destructive', text: t('offline') },
   };
 
   const current = statusInfo[status];
@@ -25,17 +27,18 @@ const StatusIndicator = ({ service, status }: { service: string, status: Status 
 };
 
 export default function SystemStatus() {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-xl">System Monitoring & Health</CardTitle>
+        <CardTitle className="font-headline text-xl">{t('systemMonitoring')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <StatusIndicator service="Weather API (OpenWeatherMap)" status="Operational" />
-        <StatusIndicator service="Satellite Imagery (ISRO Bhuvan)" status="Degraded" />
-        <StatusIndicator service="Market Price API (Agmarknet)" status="Operational" />
-        <StatusIndicator service="Firebase Firestore" status="Operational" />
-        <StatusIndicator service="AI Advisory Engine" status="Offline" />
+        <StatusIndicator service={t('weatherApi')} status="Operational" />
+        <StatusIndicator service={t('satelliteImagery')} status="Degraded" />
+        <StatusIndicator service={t('marketPriceApi')} status="Operational" />
+        <StatusIndicator service={t('firebaseFirestore')} status="Operational" />
+        <StatusIndicator service={t('aiAdvisoryEngine')} status="Offline" />
       </CardContent>
     </Card>
   );
