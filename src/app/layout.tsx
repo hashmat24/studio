@@ -4,7 +4,7 @@ import {cn} from '@/lib/utils';
 import {Toaster} from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
-import './i18n-provider'; // Import the i18n provider
+import { I18nProvider } from './i18n-provider.tsx';
 
 export const metadata: Metadata = {
   title: 'Fasal Drishti',
@@ -27,13 +27,15 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        <FirebaseClientProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-          </div>
-          <Toaster />
-        </FirebaseClientProvider>
+        <I18nProvider>
+          <FirebaseClientProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+            </div>
+            <Toaster />
+          </FirebaseClientProvider>
+        </I18nProvider>
       </body>
     </html>
   );

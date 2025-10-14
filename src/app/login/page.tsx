@@ -86,6 +86,7 @@ export default function LoginPage() {
   };
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
+    if (!auth) return;
     try {
       await initiateEmailSignIn(auth, data.email, data.password);
     } catch (error) {
@@ -94,6 +95,7 @@ export default function LoginPage() {
   };
 
   const onSignUp: SubmitHandler<FormData> = async (data) => {
+    if (!auth) return;
     try {
       await initiateEmailSignUp(auth, data.email, data.password);
     } catch (error) {
@@ -102,10 +104,11 @@ export default function LoginPage() {
   };
   
   const handleAnonymousSignIn = async () => {
+    if (!auth) return;
     try {
       await initiateAnonymousSignIn(auth);
     } catch (error) {
-      if (error instanceof FirebaseError) handleAuthEor(error);
+      if (error instanceof FirebaseError) handleAuthError(error);
     }
   };
 
@@ -180,7 +183,7 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent>
              {memoizedForm}
-            </CardContent>
+            </Content>
             <CardFooter>
               <Button onClick={form.handleSubmit(onSignUp)} className="w-full">
                 {t('createAccountBtn')}
