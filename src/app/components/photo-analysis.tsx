@@ -7,12 +7,15 @@ import { chat } from '@/ai/flows/chatbot-flow';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Camera, Loader2, Bug, ShieldCheck, Microscope, Send, MessageSquare } from 'lucide-react';
+import { Camera, Loader2, Bug, ShieldCheck, Microscope, Send, MessageSquare, User } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+
 
 function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -164,7 +167,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-lg lg:max-w-xl flex flex-col h-[70vh]">
+        <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col h-[80vh]">
           <DialogHeader>
             <DialogTitle className="font-headline text-xl flex items-center gap-2">
               <Microscope className="h-6 w-6 text-primary"/>
@@ -173,8 +176,8 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
             <DialogDescription>{t('cropAnalysisChatDesc')}</DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="flex-1 p-4 border rounded-md my-4">
-            <div className="space-y-4">
+          <ScrollArea className="flex-1 -mx-6">
+            <div className="px-6 py-4 space-y-6">
               {loadingAnalysis ? (
                 <div className="flex items-center justify-center h-48">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -188,41 +191,54 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
                 messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex items-start gap-3 ${
-                      message.role === 'user' ? 'justify-end' : ''
-                    }`}
-                  >
-                    {message.role === 'bot' && (
-                        <div className="bg-primary text-primary-foreground p-2 rounded-full">
-                            <MessageSquare className="h-5 w-5" />
-                        </div>
+                    className={cn(
+                      'flex items-start gap-3',
+                      message.role === 'user' && 'justify-end'
                     )}
+                  >
+                     {message.role === 'bot' && (
+                        <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+                            <AvatarFallback>
+                                <MessageSquare className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+                     )}
                     <div
-                      className={`rounded-lg px-4 py-2 max-w-[80%] whitespace-pre-wrap ${
+                      className={cn(
+                        'rounded-lg px-4 py-3 max-w-[85%] whitespace-pre-wrap shadow-sm',
                         message.role === 'user'
-                          ? 'bg-secondary text-secondary-foreground'
-                          : 'bg-card border'
-                      }`}
+                          ? 'bg-primary text-primary-foreground rounded-br-none'
+                          : 'bg-card border rounded-bl-none'
+                      )}
                     >
                       {message.text}
                     </div>
+                    {message.role === 'user' && (
+                        <Avatar className="h-8 w-8 bg-secondary text-secondary-foreground">
+                            <AvatarFallback>
+                                <User className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+                     )}
                   </div>
                 ))
               )}
                {loadingChat && (
                     <div className="flex items-start gap-3">
-                        <div className="bg-primary text-primary-foreground p-2 rounded-full">
-                            <MessageSquare className="h-5 w-5" />
-                        </div>
-                        <div className="rounded-lg px-4 py-2 max-w-[80%] bg-card border flex items-center">
-                            <Loader2 className="h-5 w-5 animate-spin"/>
+                         <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+                            <AvatarFallback>
+                                <MessageSquare className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="rounded-lg px-4 py-3 max-w-[85%] bg-card border flex items-center shadow-sm">
+                            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/>
                         </div>
                     </div>
                 )}
             </div>
           </ScrollArea>
 
-          <CardFooter className="mt-auto p-0 pt-4">
+          <CardFooter className="mt-auto p-0 pt-4 border-t">
             <div className="w-full flex items-center gap-2">
               <Textarea
                 value={input}
@@ -237,7 +253,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
                 }}
                 disabled={loadingAnalysis || loadingChat || messages.length === 0}
               />
-              <Button onClick={handleSendMessage} disabled={loadingAnalysis || loadingChat || !input.trim()}>
+              <Button onClick={handleSendMessage} disabled={loadingAnalysis || loadingChat || !input.trim()} size="icon">
                 <Send className="h-5 w-5" />
                 <span className="sr-only">{t('send')}</span>
               </Button>
