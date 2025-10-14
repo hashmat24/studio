@@ -6,8 +6,11 @@ import { useAuth, useUser } from '@/firebase';
 import { Button } from '../ui/button';
 import { useAdmin } from '@/hooks/use-admin';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from './language-switcher';
 
 export default function Header() {
+  const { t } = useTranslation();
   const { user, isUserLoading } = useUser();
   const { isAdmin } = useAdmin();
   const auth = useAuth();
@@ -25,7 +28,7 @@ export default function Header() {
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Leaf className="h-6 w-6 text-primary" />
             <span className="font-bold font-headline sm:inline-block">
-              Fasal Drishti
+              {t('appName')}
             </span>
           </Link>
           <nav className="flex items-center gap-6 text-sm">
@@ -33,7 +36,7 @@ export default function Header() {
               href="/"
               className="transition-colors hover:text-foreground/80 text-foreground"
             >
-              Farmer Portal
+              {t('farmerPortal')}
             </Link>
             <Link
               href="/admin"
@@ -42,21 +45,22 @@ export default function Header() {
                 isAdmin ? 'text-foreground' : 'text-foreground/60'
               )}
             >
-              Admin Dashboard
+              {t('adminDashboard')}
             </Link>
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end">
+        <div className="flex flex-1 items-center justify-end gap-2">
+          <LanguageSwitcher />
           {isUserLoading ? (
             <div className="h-8 w-20 animate-pulse rounded-md bg-muted" />
           ) : user ? (
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              {t('logout')}
             </Button>
           ) : (
             <Button asChild variant="default" size="sm">
-              <Link href="/login">Login</Link>
+              <Link href="/login">{t('login')}</Link>
             </Button>
           )}
         </div>

@@ -4,6 +4,7 @@ import {cn} from '@/lib/utils';
 import {Toaster} from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import './i18n-provider'; // Import the i18n provider
 
 export const metadata: Metadata = {
   title: 'Fasal Drishti',

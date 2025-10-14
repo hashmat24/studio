@@ -1,0 +1,19 @@
+{
+  "appName": "Fasal Drishti",
+  "farmerPortal": "Farmer Portal",
+  "adminDashboard": "Admin Dashboard",
+  "login": "Login",
+  "logout": "Logout",
+  "welcomeBack": "Welcome Back",
+  "signInPrompt": "Sign in to access your farm dashboard.",
+  "signUp": "Sign Up",
+  "createAccount": "Create an Account",
+  "joinPrompt": "Join Fasal Drishti to get started.",
+  "email": "Email",
+  "password": "Password",
+  "signIn": "Sign In",
+  "continueAsGuest": "Continue as Guest",
+  "createAccountBtn": "Create Account",
+  "english": "English",
+  "marathi": "Marathi"
+}

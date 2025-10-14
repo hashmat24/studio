@@ -31,6 +31,7 @@ import {
 } from '@/firebase/non-blocking-login';
 import { FirebaseError } from 'firebase/app';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -42,6 +43,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
@@ -103,7 +105,7 @@ export default function LoginPage() {
     try {
       await initiateAnonymousSignIn(auth);
     } catch (error) {
-      if (error instanceof FirebaseError) handleAuthError(error);
+      if (error instanceof FirebaseError) handleAuthEor(error);
     }
   };
 
@@ -115,7 +117,7 @@ export default function LoginPage() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('email')}</FormLabel>
               <FormControl>
                 <Input placeholder="farmer@example.com" {...field} />
               </FormControl>
@@ -128,7 +130,7 @@ export default function LoginPage() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{t('password')}</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -138,21 +140,21 @@ export default function LoginPage() {
         />
       </form>
     </Form>
-  ), [form]);
+  ), [form, t]);
 
   return (
     <div className="container flex min-h-[calc(100vh-3.5rem)] items-center justify-center py-12">
       <Tabs defaultValue="login" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <TabsTrigger value="login">{t('login')}</TabsTrigger>
+          <TabsTrigger value="signup">{t('signUp')}</TabsTrigger>
         </TabsList>
         <TabsContent value="login">
           <Card>
             <CardHeader>
-              <CardTitle>Welcome Back</CardTitle>
+              <CardTitle>{t('welcomeBack')}</CardTitle>
               <CardDescription>
-                Sign in to access your farm dashboard.
+                {t('signInPrompt')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -160,10 +162,10 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex-col gap-4">
               <Button onClick={form.handleSubmit(onSubmit)} className="w-full">
-                Sign In
+                {t('signIn')}
               </Button>
               <Button onClick={handleAnonymousSignIn} variant="link" className="w-full">
-                Continue as Guest
+                {t('continueAsGuest')}
               </Button>
             </CardFooter>
           </Card>
@@ -171,9 +173,9 @@ export default function LoginPage() {
         <TabsContent value="signup">
           <Card>
             <CardHeader>
-              <CardTitle>Create an Account</CardTitle>
+              <CardTitle>{t('createAccount')}</CardTitle>
               <CardDescription>
-                Join Krishi Mitra to get started.
+                {t('joinPrompt')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -181,7 +183,7 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter>
               <Button onClick={form.handleSubmit(onSignUp)} className="w-full">
-                Create Account
+                {t('createAccountBtn')}
               </Button>
             </CardFooter>
           </Card>

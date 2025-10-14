@@ -1,0 +1,19 @@
+{
+  "appName": "फसल दृष्टी",
+  "farmerPortal": "शेतकरी पोर्टल",
+  "adminDashboard": "प्रशासक डॅशबोर्ड",
+  "login": "लॉग इन करा",
+  "logout": "लॉग आउट",
+  "welcomeBack": "पुन्हा स्वागत आहे",
+  "signInPrompt": "तुमच्या फार्म डॅशबोर्डवर प्रवेश करण्यासाठी साइन इन करा.",
+  "signUp": "साइन अप करा",
+  "createAccount": "खाते तयार करा",
+  "joinPrompt": "सुरुवात करण्यासाठी फसल दृष्टीमध्ये सामील व्हा.",
+  "email": "ईमेल",
+  "password": "पासवर्ड",
+  "signIn": "साइन इन करा",
+  "continueAsGuest": "अतिथी म्हणून पुढे जा",
+  "createAccountBtn": "खाते तयार करा",
+  "english": "English",
+  "marathi": "मराठी"
+}
