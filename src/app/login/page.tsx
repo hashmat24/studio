@@ -183,7 +183,7 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent>
              {memoizedForm}
-            </Content>
+            </CardContent>
             <CardFooter>
               <Button onClick={form.handleSubmit(onSignUp)} className="w-full">
                 {t('createAccountBtn')}
