@@ -9,13 +9,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Languages } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
