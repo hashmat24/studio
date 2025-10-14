@@ -6,7 +6,7 @@ import Header from '@/components/layout/header';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'Krishi Mitra',
+  title: 'Fasal Drishti',
   description: 'Smart Crop Advisory System',
 };
 
