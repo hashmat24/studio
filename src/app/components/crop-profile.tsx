@@ -12,10 +12,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useUser, useDoc, useMemoFirebase } from '@/firebase';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { doc } from 'firebase/firestore';
-import { Loader2, MapPin } from 'lucide-react';
+import { Loader2, MapPin, User as UserIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const profileSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required.' }),
   cropType: z.string().min(1, { message: 'Crop type is required.' }),
   farmingMethods: z.string().min(1, { message: 'Farming methods are required.' }),
   area: z.coerce.number().min(0.1, { message: 'Area must be greater than 0.' }),
@@ -40,6 +41,7 @@ export default function CropProfile() {
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      name: '',
       cropType: '',
       farmingMethods: '',
       area: 0,
@@ -48,10 +50,14 @@ export default function CropProfile() {
   });
 
   useEffect(() => {
+    // Set default name from user auth if profile is new
+    if (!profileData && user) {
+        form.setValue('name', user.displayName || user.email?.split('@')[0] || '');
+    }
     if (profileData) {
       form.reset(profileData);
     }
-  }, [profileData, form]);
+  }, [profileData, form, user]);
 
   const onSubmit: SubmitHandler<ProfileFormData> = async (data) => {
     if (!user || !firestore) {
@@ -68,8 +74,8 @@ export default function CropProfile() {
     const fullProfileData = {
         ...data,
         id: user.uid,
-        phoneNumber: user.phoneNumber || 'N/A', // Or get it from a form
-        preferredLanguage: 'en', // Or get it from a form
+        phoneNumber: user.phoneNumber || 'N/A',
+        preferredLanguage: i18n.language,
     };
 
     setDocumentNonBlocking(profileRef, fullProfileData);
@@ -79,6 +85,8 @@ export default function CropProfile() {
       description: t('profileUpdatedDesc'),
     });
   };
+  
+  const { i18n } = useTranslation();
 
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
@@ -95,6 +103,22 @@ export default function CropProfile() {
                 </div>
             ) : (
             <>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('name')}</FormLabel>
+                   <FormControl>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input placeholder={t('namePlaceholder')} className="pl-10" {...field} />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="cropType"

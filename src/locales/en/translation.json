@@ -137,5 +137,7 @@
   "cameraAccessRequiredDesc": "Please allow camera access in your browser to use this feature. You may need to refresh the page.",
   "capturePhoto": "Capture Photo",
   "cameraAccessDeniedTitle": "Camera Access Denied",
-  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings."
+  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings.",
+  "name": "Name",
+  "namePlaceholder": "e.g., Ram Patil"
 }

@@ -10,6 +10,10 @@
           "type": "string",
           "description": "Unique identifier for the farmer profile."
         },
+        "name": {
+          "type": "string",
+          "description": "The name of the farmer."
+        },
         "phoneNumber": {
           "type": "string",
           "description": "Farmer's phone number."
@@ -37,6 +41,7 @@
       },
       "required": [
         "id",
+        "name",
         "phoneNumber",
         "location",
         "cropType",
