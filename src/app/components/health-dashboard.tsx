@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sun, CloudRain, AlertTriangle, Droplets, Sprout, Loader2 } from 'lucide-react';
+import { AlertTriangle, Droplets, Sprout, Loader2 } from 'lucide-react';
 import type { AdvisoryItem } from './real-time-advisory';
 import type { SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
 import { useEffect, useState, useRef } from 'react';
@@ -69,7 +69,6 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
     }
     
     setLoading(true);
-    setAdvisoryItems(null);
     originalAdviceRef.current = null;
     try {
       // Always fetch the canonical advice in English
@@ -112,6 +111,7 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
         title: t('error'),
         description: t('fetchAdviceError'),
       });
+      setAdvisoryItems(null);
     } finally {
       setLoading(false);
     }
@@ -126,39 +126,35 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
 
   useEffect(() => {
     const translateExistingAdvice = async () => {
+        // Only run translation if there is original advice stored
         if (!advisoryItems || !originalAdviceRef.current) return;
 
         setLoading(true);
         try {
-            if (i18n.language === 'en') {
-                // Revert to original English text
-                const newAdvisory = advisoryItems.map(item => {
-                    if (item.id === 'irrigationAdvice') {
-                        return { ...item, advice: originalAdviceRef.current!.irrigationAdvice };
-                    }
-                    if (item.id === 'fertilizerTimingAdvice') {
-                        return { ...item, advice: originalAdviceRef.current!.fertilizerTimingAdvice };
-                    }
-                    return item;
-                });
-                setAdvisoryItems(newAdvisory);
-            } else {
-                // Translate from original English text
+            let irrigationAdvice = originalAdviceRef.current.irrigationAdvice;
+            let fertilizerTimingAdvice = originalAdviceRef.current.fertilizerTimingAdvice;
+
+            // If target language is not English, translate it. Otherwise, use the original English text.
+            if (i18n.language !== 'en') {
                 const [irrigation, fertilizer] = await Promise.all([
                     translateText({ text: originalAdviceRef.current.irrigationAdvice, language: i18n.language }),
                     translateText({ text: originalAdviceRef.current.fertilizerTimingAdvice, language: i18n.language })
                 ]);
-                const newAdvisory = advisoryItems.map(item => {
-                    if (item.id === 'irrigationAdvice') {
-                        return { ...item, advice: irrigation.translatedText };
-                    }
-                    if (item.id === 'fertilizerTimingAdvice') {
-                        return { ...item, advice: fertilizer.translatedText };
-                    }
-                    return item;
-                });
-                setAdvisoryItems(newAdvisory);
+                irrigationAdvice = irrigation.translatedText;
+                fertilizerTimingAdvice = fertilizer.translatedText;
             }
+            
+            const newAdvisory = advisoryItems.map(item => {
+                if (item.id === 'irrigationAdvice') {
+                    return { ...item, advice: irrigationAdvice };
+                }
+                if (item.id === 'fertilizerTimingAdvice') {
+                    return { ...item, advice: fertilizerTimingAdvice };
+                }
+                return item;
+            });
+            setAdvisoryItems(newAdvisory);
+
         } catch(error) {
             console.error('Failed to translate advice:', error);
             toast({
@@ -171,6 +167,8 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
         }
     };
     
+    // This effect should only run for language changes.
+    // It will not trigger the initial fetch.
     translateExistingAdvice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
@@ -205,7 +203,7 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
     return 'Attention';
   }
 
-  const getAdviceText = (id: keyof Omit<import('@/ai/flows/real-time-personalized-advice').RealTimePersonalizedAdviceOutput, 'harvestAlert'>) => {
+  const getAdviceText = (id: 'irrigationAdvice' | 'fertilizerTimingAdvice') => {
     return advisoryItems?.find(i => i.id === id)?.advice || '';
   }
 
@@ -236,3 +234,5 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
     </Card>
   );
 }
+
+    
