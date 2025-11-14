@@ -17,13 +17,14 @@ const SmartPhotoAnalysisForCropHealthInputSchema = z.object({
     .describe(
       'A photo of the crop, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.'
     ),
+    language: z.string().describe('The language for the response (e.g., "en" for English, "mr" for Marathi).'),
 });
 export type SmartPhotoAnalysisForCropHealthInput = z.infer<
   typeof SmartPhotoAnalysisForCropHealthInputSchema
 >;
 
 const SmartPhotoAnalysisForCropHealthOutputSchema = z.object({
-  pestOrDisease: z.string().describe('The identified pest or disease, if any.'),
+  pestOrDisease: z.string().describe('The identified pest or disease, if any. Respond with N/A if not applicable.'),
   treatmentRecommendations: z
     .string()
     .describe('Treatment recommendations for the identified pest or disease.'),
@@ -45,6 +46,8 @@ const prompt = ai.definePrompt({
   output: {schema: SmartPhotoAnalysisForCropHealthOutputSchema},
   prompt: `You are an AI assistant specialized in diagnosing crop health from images.
 
+  Respond in the following language: {{{language}}}.
+
   Analyze the provided crop image and identify any potential pests or diseases.
   Provide treatment recommendations to address the identified issues.
   Also provide a general health assessment of the crop.
@@ -53,10 +56,6 @@ const prompt = ai.definePrompt({
   {{media url=photoDataUri}}
 
   Respond concisely with the identified pest/disease, treatment recommendations, and health assessment.
-  Follow this format:
-  Pest/Disease: <pest or disease, or N/A if none>
-  Treatment Recommendations: <treatment recommendations>
-  Health Assessment: <overall health assessment>
 `,
 });
 

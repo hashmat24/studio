@@ -12,6 +12,7 @@ import { z } from 'genkit';
 
 const ChatInputSchema = z.object({
   message: z.string().describe('The user\'s message to the chatbot.'),
+  language: z.string().describe('The language for the response (e.g., "en" for English, "mr" for Marathi).'),
 });
 export type ChatInput = z.infer<typeof ChatInputSchema>;
 
@@ -30,6 +31,7 @@ const prompt = ai.definePrompt({
   output: { schema: ChatOutputSchema },
   prompt: `You are Krishi Mitra, a friendly and knowledgeable AI assistant for farmers.
   Your goal is to provide helpful and concise advice on farming topics.
+  Respond in the following language: {{{language}}}.
   If a user asks about something unrelated to farming, politely steer the conversation back to agriculture.
 
   User's message: {{{message}}}

@@ -19,6 +19,7 @@ const RealTimePersonalizedAdviceInputSchema = z.object({
   weatherConditions: z.string().describe('The current weather conditions at the farm.'),
   soilHealthCardData: z.string().describe('The soil health card data.'),
   agriStackData: z.string().describe('The AgriStack data.'),
+  language: z.string().describe('The language for the response (e.g., "en" for English, "mr" for Marathi).'),
 });
 
 export type RealTimePersonalizedAdviceInput = z.infer<typeof RealTimePersonalizedAdviceInputSchema>;
@@ -42,6 +43,8 @@ const prompt = ai.definePrompt({
   input: {schema: RealTimePersonalizedAdviceInputSchema},
   output: {schema: RealTimePersonalizedAdviceOutputSchema},
   prompt: `You are an expert agricultural advisor providing real-time, personalized advice to farmers.
+
+  Respond in the following language: {{{language}}}.
 
   Based on the farm's profile and current weather conditions, provide advice on irrigation, fertilizer timing, and harvest alerts.
 

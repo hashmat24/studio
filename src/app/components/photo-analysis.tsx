@@ -37,7 +37,7 @@ type Message = {
 };
 
 export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResult }: PhotoAnalysisProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
@@ -83,7 +83,10 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
     setIsAnalysisDialogOpen(true);
 
     try {
-      const result = await smartPhotoAnalysisForCropHealth({ photoDataUri: selectedImage });
+      const result = await smartPhotoAnalysisForCropHealth({ 
+        photoDataUri: selectedImage,
+        language: i18n.language,
+      });
       setAnalysisResult(result);
       setParentAnalysisResult(result);
       
@@ -117,7 +120,10 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
     try {
       // We can provide context from the analysis to the chatbot
       const analysisContext = analysisResult ? `The user is asking about a crop with the following analysis: Health is ${analysisResult.healthAssessment}, Pest/Disease found is ${analysisResult.pestOrDisease}.` : '';
-      const result = await chat({ message: `${analysisContext} User's question: ${input}` });
+      const result = await chat({ 
+        message: `${analysisContext} User's question: ${input}`,
+        language: i18n.language,
+      });
       const botMessage: Message = { role: 'bot', text: result.response };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {

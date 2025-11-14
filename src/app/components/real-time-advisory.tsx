@@ -25,7 +25,7 @@ type RealTimeAdvisoryProps = {
 
 
 export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: RealTimeAdvisoryProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [advisory, setAdvisory] = useState<AdvisoryItem[] | null>(null);
   const { toast } = useToast();
@@ -53,6 +53,7 @@ export default function RealTimeAdvisory({ setAdvisoryItems, farmerProfile }: Re
         cropType: farmerProfile.cropType,
         area: farmerProfile.area,
         farmingMethods: farmerProfile.farmingMethods,
+        language: i18n.language,
         // These can be dynamic later
         weatherConditions: 'Sunny, 32°C, Humidity 45%',
         soilHealthCardData: 'pH: 6.8, N: High, P: Medium, K: High',
