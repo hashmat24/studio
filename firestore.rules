@@ -105,15 +105,8 @@ service cloud.firestore {
      * @principle Enforces admin ownership.
      */
     match /roles_admin/{adminId} {
-        function isExistingOwner(adminId) {
-            return isOwner(adminId) && resource != null;
-        }
-
-        allow get: if isOwner(adminId);
-        allow list: if false;
-        allow create: if isOwner(adminId) && request.resource.data.id == adminId;
-        allow update: if isExistingOwner(adminId) && request.resource.data.id == resource.data.id;
-        allow delete: if isExistingOwner(adminId);
+      allow read, write: if isOwner(adminId);
+      allow list: if false;
     }
   }
 }
