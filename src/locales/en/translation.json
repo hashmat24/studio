@@ -127,5 +127,12 @@
   "completeProfilePrompt": "Fill out the \"My Farm Profile\" card to receive AI-powered advice.",
   "helpful": "Helpful?",
   "completed": "Completed",
-  "markAsComplete": "Mark as Complete"
+  "markAsComplete": "Mark as Complete",
+  "takePictureTitle": "Take a Picture",
+  "takePictureDesc": "Position the crop in the frame and capture a clear image.",
+  "cameraAccessRequiredTitle": "Camera Access Required",
+  "cameraAccessRequiredDesc": "Please allow camera access in your browser to use this feature. You may need to refresh the page.",
+  "capturePhoto": "Capture Photo",
+  "cameraAccessDeniedTitle": "Camera Access Denied",
+  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings."
 }

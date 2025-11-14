@@ -155,8 +155,8 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
             setHasCameraPermission(false);
             toast({
                 variant: 'destructive',
-                title: 'Camera Access Denied',
-                description: 'Please enable camera permissions in your browser settings.',
+                title: t('cameraAccessDeniedTitle'),
+                description: t('cameraAccessDeniedDesc'),
             });
         }
     } else {
@@ -321,25 +321,25 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
           <DialogHeader>
             <DialogTitle className="font-headline text-xl flex items-center gap-2">
               <Video className="h-6 w-6 text-primary"/>
-              Take a Picture
+              {t('takePictureTitle')}
             </DialogTitle>
             <DialogDescription>
-              Position the crop in the frame and capture a clear image.
+              {t('takePictureDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className='my-4'>
             <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted playsInline />
             {hasCameraPermission === false && (
                 <Alert variant="destructive" className="mt-4">
-                  <AlertTitle>Camera Access Required</AlertTitle>
+                  <AlertTitle>{t('cameraAccessRequiredTitle')}</AlertTitle>
                   <AlertDescription>
-                    Please allow camera access in your browser to use this feature. You may need to refresh the page.
+                    {t('cameraAccessRequiredDesc')}
                   </AlertDescription>
                 </Alert>
             )}
           </div>
           <Button onClick={handleCapture} disabled={!hasCameraPermission}>
-            <CircleDot className="mr-2 h-4 w-4" /> Capture Photo
+            <CircleDot className="mr-2 h-4 w-4" /> {t('capturePhoto')}
           </Button>
         </DialogContent>
       </Dialog>
