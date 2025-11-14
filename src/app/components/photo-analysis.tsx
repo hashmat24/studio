@@ -297,7 +297,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
             </div>
           </ScrollArea>
 
-          <CardFooter className="mt-auto p-0 pt-4 border-t flex-col items-stretch gap-4">
+          <CardFooter className="mt-auto p-0 pt-4 border-t">
             <div className="w-full flex items-center gap-2">
               <Textarea
                 value={input}
@@ -317,10 +317,6 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
                 <span className="sr-only">{t('send')}</span>
               </Button>
             </div>
-            <Button variant="outline" onClick={() => setIsAnalysisDialogOpen(false)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('backToDashboard')}
-            </Button>
           </CardFooter>
         </DialogContent>
       </Dialog>
