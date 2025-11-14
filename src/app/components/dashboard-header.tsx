@@ -10,6 +10,18 @@ type DashboardHeaderProps = {
 export default function DashboardHeader({ user }: DashboardHeaderProps) {
   const { t, i18n } = useTranslation();
   const [date, setDate] = useState<string | null>(null);
+  const [isNewUser, setIsNewUser] = useState(false);
+
+  useEffect(() => {
+    if (user?.metadata.creationTime && user?.metadata.lastSignInTime) {
+      const creation = new Date(user.metadata.creationTime).getTime();
+      const lastSignIn = new Date(user.metadata.lastSignInTime).getTime();
+      // Consider a new user if last sign-in is within 5 seconds of creation
+      if (Math.abs(lastSignIn - creation) < 5000) {
+        setIsNewUser(true);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     const currentDate = new Date().toLocaleDateString(i18n.language, {
@@ -22,12 +34,14 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
   }, [i18n.language]);
 
   const displayName = user?.displayName || user?.email?.split('@')[0] || t('farmer');
+  
+  const welcomeMessage = isNewUser ? t('welcomeUser', { name: displayName }) : t('welcomeBackUser', { name: displayName });
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-headline text-primary">
-          {t('welcomeBackUser', { name: displayName })}
+          {welcomeMessage}
         </h1>
         {date && (
           <p className="text-muted-foreground mt-1">

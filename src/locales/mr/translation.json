@@ -56,6 +56,7 @@
   "farmLocation": "शेताचे ठिकाण",
   "locationPlaceholder": "नकाशातून निवडण्यासाठी क्लिक करा...",
   "saveProfile": "प्रोफाइल सेव्ह करा",
+  "welcomeUser": "स्वागत आहे, {{name}}!",
   "welcomeBackUser": "पुन्हा स्वागत आहे, {{name}}!",
   "dashboardHeaderDesc": "{{date}} साठी तुमच्या शेताचा आढावा येथे आहे.",
   "visualHealthDashboard": "दृष्य आरोग्य डॅशबोर्ड",
@@ -136,6 +137,5 @@
   "cameraAccessRequiredDesc": "हे वैशिष्ट्य वापरण्यासाठी कृपया तुमच्या ब्राउझरमध्ये कॅमेरा प्रवेशास अनुमती द्या. तुम्हाला कदाचित पृष्ठ रीफ्रेश करावे लागेल.",
   "capturePhoto": "फोटो कॅप्चर करा",
   "cameraAccessDeniedTitle": "कॅमेरा प्रवेश नाकारला",
-  "cameraAccessDeniedDesc": "कृपया तुमच्या ब्राउझर सेटिंग्जमध्ये कॅमेरा परवानग्या सक्षम करा.",
-  "backToDashboard": "डॅशबोर्डवर परत जा"
+  "cameraAccessDeniedDesc": "कृपया तुमच्या ब्राउझर सेटिंग्जमध्ये कॅमेरा परवानग्या सक्षम करा."
 }

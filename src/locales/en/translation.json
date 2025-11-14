@@ -56,6 +56,7 @@
   "farmLocation": "Farm Location",
   "locationPlaceholder": "Click to select from map...",
   "saveProfile": "Save Profile",
+  "welcomeUser": "Welcome, {{name}}!",
   "welcomeBackUser": "Welcome back, {{name}}!",
   "dashboardHeaderDesc": "Here's your farm's overview for {{date}}.",
   "visualHealthDashboard": "Visual Health Dashboard",
@@ -136,6 +137,5 @@
   "cameraAccessRequiredDesc": "Please allow camera access in your browser to use this feature. You may need to refresh the page.",
   "capturePhoto": "Capture Photo",
   "cameraAccessDeniedTitle": "Camera Access Denied",
-  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings.",
-  "backToDashboard": "Back to Dashboard"
+  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings."
 }
