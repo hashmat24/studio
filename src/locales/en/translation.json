@@ -144,5 +144,6 @@
   "chatbotTitle": "Fasal Drishti Assistant",
   "chatbotDesc": "Your AI-powered farming companion. Ask me anything about your crops, weather, or market prices.",
   "chatbotWelcome": "Hello! I'm your Fasal Drishti Assistant. How can I help you today?",
-  "askAnything": "Ask me anything..."
+  "askAnything": "Ask me anything...",
+  "chatbotBusy": "The AI is currently busy with a high number of requests. Please try again in a moment."
 }

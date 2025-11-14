@@ -41,13 +41,21 @@ export default function Chatbot() {
       });
       const botMessage: Message = { role: 'bot', text: result.response };
       setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chatbot error:', error);
-      toast({
-        variant: 'destructive',
-        title: t('chatbotError'),
-        description: t('chatbotErrorDesc'),
-      });
+      
+      let botMessage: Message;
+      // Check for specific "503" error from the generative AI service
+      if (error.message && error.message.includes('503')) {
+        botMessage = { role: 'bot', text: t('chatbotBusy') };
+        setMessages((prev) => [...prev, botMessage]);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('chatbotError'),
+          description: t('chatbotErrorDesc'),
+        });
+      }
     } finally {
       setLoading(false);
     }
