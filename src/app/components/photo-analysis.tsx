@@ -7,7 +7,7 @@ import { chat } from '@/ai/flows/chatbot-flow';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Camera, Loader2, Bug, ShieldCheck, Microscope, Send, MessageSquare, User, Video, CircleDot } from 'lucide-react';
+import { Camera, Loader2, Bug, ShieldCheck, Microscope, Send, MessageSquare, User, Video, CircleDot, ArrowLeft } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -297,7 +297,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
             </div>
           </ScrollArea>
 
-          <CardFooter className="mt-auto p-0 pt-4 border-t">
+          <CardFooter className="mt-auto p-0 pt-4 border-t flex-col items-stretch gap-4">
             <div className="w-full flex items-center gap-2">
               <Textarea
                 value={input}
@@ -317,6 +317,10 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
                 <span className="sr-only">{t('send')}</span>
               </Button>
             </div>
+            <Button variant="outline" onClick={() => setIsAnalysisDialogOpen(false)}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('backToDashboard')}
+            </Button>
           </CardFooter>
         </DialogContent>
       </Dialog>

@@ -116,6 +116,8 @@
   "irrigationAdvice": "Irrigation Advice",
   "fertilizerTiming": "Fertilizer Timing",
   "harvestAlert": "Harvest Alert",
+  "harvestAlertSample": "The current market price for tomatoes is high. It's a good time to harvest the ripe ones.",
+  "getHarvestAlert": "Check for Harvest Alerts",
   "taskCompleted": "Task Completed!",
   "taskCompletedDesc": "Great job staying on top of your farm tasks.",
   "feedbackReceived": "Feedback Received",
@@ -134,5 +136,6 @@
   "cameraAccessRequiredDesc": "Please allow camera access in your browser to use this feature. You may need to refresh the page.",
   "capturePhoto": "Capture Photo",
   "cameraAccessDeniedTitle": "Camera Access Denied",
-  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings."
+  "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings.",
+  "backToDashboard": "Back to Dashboard"
 }
