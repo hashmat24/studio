@@ -139,5 +139,10 @@
   "cameraAccessDeniedTitle": "Camera Access Denied",
   "cameraAccessDeniedDesc": "Please enable camera permissions in your browser settings.",
   "name": "Name",
-  "namePlaceholder": "e.g., Ram Patil"
+  "namePlaceholder": "e.g., Ram Patil",
+  "openChat": "Open Chat",
+  "chatbotTitle": "Fasal Drishti Assistant",
+  "chatbotDesc": "Your AI-powered farming companion. Ask me anything about your crops, weather, or market prices.",
+  "chatbotWelcome": "Hello! I'm your Fasal Drishti Assistant. How can I help you today?",
+  "askAnything": "Ask me anything..."
 }

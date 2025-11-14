@@ -11,6 +11,7 @@ import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Loader2 } from 'lucide-react';
 import CropProfile from './components/crop-profile';
 import { doc } from 'firebase/firestore';
+import Chatbot from './components/chatbot';
 
 export type FarmerProfileData = {
     cropType: string;
@@ -51,6 +52,7 @@ export default function Home() {
 
 
   return (
+    <>
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
       <DashboardHeader user={user} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
@@ -75,5 +77,7 @@ export default function Home() {
         </div>
       </div>
     </div>
+    <Chatbot />
+    </>
   );
 }
