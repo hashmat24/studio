@@ -15,3 +15,4 @@ if (!process.env.GEMINI_API_KEY) {
 import '@/ai/flows/real-time-personalized-advice.ts';
 import '@/ai/flows/smart-photo-analysis-for-crop-health.ts';
 import '@/ai/flows/chatbot-flow.ts';
+import '@/ai/flows/translation-flow.ts';

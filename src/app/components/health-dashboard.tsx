@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sun, CloudRain, AlertTriangle, Droplets, Sprout, Loader2 } from 'lucide-react';
 import type { AdvisoryItem } from './real-time-advisory';
 import type { SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getRealTimePersonalizedAdvice } from '@/ai/flows/real-time-personalized-advice';
+import { translateText } from '@/ai/flows/translation-flow';
 import { useToast } from '@/hooks/use-toast';
 import type { FarmerProfileData } from '@/app/page';
 
@@ -48,6 +49,9 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
   const { toast } = useToast();
   const [overallHealth, setOverallHealth] = useState<HealthStatus>('Good');
   const [loading, setLoading] = useState(false);
+  
+  // Store the original advice in English to use for translation
+  const originalAdviceRef = useRef<{ irrigationAdvice: string; fertilizerTimingAdvice: string; } | null>(null);
 
   useEffect(() => {
     let health: HealthStatus = 'Good';
@@ -61,27 +65,44 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
 
   const fetchAdvice = async () => {
     if (!farmerProfile) {
-        // This toast is handled by the RealTimeAdvisory component button
         return;
     }
     
     setLoading(true);
     setAdvisoryItems(null);
+    originalAdviceRef.current = null;
     try {
+      // Always fetch the canonical advice in English
       const result = await getRealTimePersonalizedAdvice({
         location: farmerProfile.location,
         cropType: farmerProfile.cropType,
         area: farmerProfile.area,
         farmingMethods: farmerProfile.farmingMethods,
-        language: i18n.language,
+        language: 'en', // Fetch in English
         weatherConditions: 'Sunny, 32°C, Humidity 45%',
         soilHealthCardData: 'pH: 6.8, N: High, P: Medium, K: High',
         agriStackData: 'Standard regional data applied.',
       });
 
+      originalAdviceRef.current = {
+          irrigationAdvice: result.irrigationAdvice,
+          fertilizerTimingAdvice: result.fertilizerTimingAdvice
+      };
+
+      let translatedResult = { ...result };
+      // If the current language is not English, translate the advice
+      if (i18n.language !== 'en') {
+          const [irrigation, fertilizer] = await Promise.all([
+            translateText({ text: result.irrigationAdvice, language: i18n.language }),
+            translateText({ text: result.fertilizerTimingAdvice, language: i18n.language })
+          ]);
+          translatedResult.irrigationAdvice = irrigation.translatedText;
+          translatedResult.fertilizerTimingAdvice = fertilizer.translatedText;
+      }
+
       const newAdvisory: AdvisoryItem[] = [
-        { id: 'irrigationAdvice', title: t('irrigation'), icon: Droplets, advice: result.irrigationAdvice, completed: false, feedback: null },
-        { id: 'fertilizerTimingAdvice', title: t('fertilizer'), icon: Sprout, advice: result.fertilizerTimingAdvice, completed: false, feedback: null },
+        { id: 'irrigationAdvice', title: t('irrigation'), icon: Droplets, advice: translatedResult.irrigationAdvice, completed: false, feedback: null },
+        { id: 'fertilizerTimingAdvice', title: t('fertilizer'), icon: Sprout, advice: translatedResult.fertilizerTimingAdvice, completed: false, feedback: null },
       ];
       setAdvisoryItems(newAdvisory);
     } catch (error) {
@@ -104,10 +125,53 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
   }, [refreshAdvisory]);
 
   useEffect(() => {
-    // Re-fetch advice if the language changes and there is existing advice.
-    if (advisoryItems) {
-      fetchAdvice();
-    }
+    const translateExistingAdvice = async () => {
+        if (!advisoryItems || !originalAdviceRef.current) return;
+
+        setLoading(true);
+        try {
+            if (i18n.language === 'en') {
+                // Revert to original English text
+                const newAdvisory = advisoryItems.map(item => {
+                    if (item.id === 'irrigationAdvice') {
+                        return { ...item, advice: originalAdviceRef.current!.irrigationAdvice };
+                    }
+                    if (item.id === 'fertilizerTimingAdvice') {
+                        return { ...item, advice: originalAdviceRef.current!.fertilizerTimingAdvice };
+                    }
+                    return item;
+                });
+                setAdvisoryItems(newAdvisory);
+            } else {
+                // Translate from original English text
+                const [irrigation, fertilizer] = await Promise.all([
+                    translateText({ text: originalAdviceRef.current.irrigationAdvice, language: i18n.language }),
+                    translateText({ text: originalAdviceRef.current.fertilizerTimingAdvice, language: i18n.language })
+                ]);
+                const newAdvisory = advisoryItems.map(item => {
+                    if (item.id === 'irrigationAdvice') {
+                        return { ...item, advice: irrigation.translatedText };
+                    }
+                    if (item.id === 'fertilizerTimingAdvice') {
+                        return { ...item, advice: fertilizer.translatedText };
+                    }
+                    return item;
+                });
+                setAdvisoryItems(newAdvisory);
+            }
+        } catch(error) {
+            console.error('Failed to translate advice:', error);
+            toast({
+                variant: 'destructive',
+                title: t('error'),
+                description: 'Failed to translate advice. Please refresh.',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    translateExistingAdvice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
