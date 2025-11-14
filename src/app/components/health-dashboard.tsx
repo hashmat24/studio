@@ -59,13 +59,6 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
     setOverallHealth(health);
   }, [advisoryItems, analysisResult]);
 
-  useEffect(() => {
-    if (refreshAdvisory > 0) {
-      fetchAdvice();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshAdvisory]);
-
   const fetchAdvice = async () => {
     if (!farmerProfile) {
         // This toast is handled by the RealTimeAdvisory component button
@@ -102,6 +95,21 @@ export default function HealthDashboard({ advisoryItems, setAdvisoryItems, analy
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+    if (refreshAdvisory > 0) {
+      fetchAdvice();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshAdvisory]);
+
+  useEffect(() => {
+    // Re-fetch advice if the language changes and there is existing advice.
+    if (advisoryItems) {
+      fetchAdvice();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]);
 
 
   const overallHealthInfo = {
