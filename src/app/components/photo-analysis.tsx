@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { smartPhotoAnalysisForCropHealth, type SmartPhotoAnalysisForCropHealthOutput } from '@/ai/flows/smart-photo-analysis-for-crop-health';
 import { chat } from '@/ai/flows/chatbot-flow';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Camera, Loader2, Bug, ShieldCheck, Microscope, Send, MessageSquare, User } from 'lucide-react';
+import { Camera, Loader2, Bug, ShieldCheck, Microscope, Send, MessageSquare, User, Video, CircleDot } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function fileToDataUri(file: File): Promise<string> {
@@ -41,13 +42,23 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<SmartPhotoAnalysisForCropHealthOutput | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAnalysisDialogOpen, setIsAnalysisDialogOpen] = useState(false);
+  const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
   const placeholderImage = PlaceHolderImages.find(p => p.id === 'crop-analysis-leaf');
+
+  useEffect(() => {
+    // Stop video stream when camera dialog is closed
+    if (!isCameraDialogOpen && videoRef.current && videoRef.current.srcObject) {
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+    }
+  }, [isCameraDialogOpen]);
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -59,7 +70,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
       setMessages([]);
     }
   };
-
+  
   const handleAnalyzeClick = async () => {
     if (!selectedImage) {
       toast({ variant: 'destructive', title: t('noImage'), description: t('noImageDesc') });
@@ -69,7 +80,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
     setAnalysisResult(null);
     setParentAnalysisResult(null);
     setMessages([]);
-    setIsDialogOpen(true);
+    setIsAnalysisDialogOpen(true);
 
     try {
       const result = await smartPhotoAnalysisForCropHealth({ photoDataUri: selectedImage });
@@ -89,7 +100,7 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
         title: t('analysisFailed'),
         description: t('analysisFailedDesc'),
       });
-      setIsDialogOpen(false);
+      setIsAnalysisDialogOpen(false);
     } finally {
       setLoadingAnalysis(false);
     }
@@ -130,7 +141,46 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
     }
   };
 
+  const openCamera = async () => {
+    setIsCameraDialogOpen(true);
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+            setHasCameraPermission(true);
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            setHasCameraPermission(false);
+            toast({
+                variant: 'destructive',
+                title: 'Camera Access Denied',
+                description: 'Please enable camera permissions in your browser settings.',
+            });
+        }
+    } else {
+        setHasCameraPermission(false);
+    }
+  }
+
+  const handleCapture = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        const dataUri = canvas.toDataURL('image/jpeg');
+        setSelectedImage(dataUri);
+      }
+      setIsCameraDialogOpen(false);
+    }
+  };
+
   return (
+    <>
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
         <CardTitle className="font-headline text-xl">{t('smartPhotoAnalysis')}</CardTitle>
@@ -158,15 +208,18 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
             <Camera className="mr-2 h-4 w-4" /> {t('uploadPhoto')}
           </Button>
-          <Button variant="secondary" onClick={handleUseSample}>{t('useSample')}</Button>
+          <Button variant="outline" onClick={openCamera}>
+            <Video className="mr-2 h-4 w-4" /> {t('takePicture')}
+          </Button>
         </div>
+        <Button onClick={handleUseSample} variant="secondary" className="w-full mt-2">{t('useSample')}</Button>
         <Button onClick={handleAnalyzeClick} disabled={!selectedImage || loadingAnalysis} className="w-full mt-2">
           {loadingAnalysis && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {t('analyzeCropHealth')}
         </Button>
       </CardContent>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isAnalysisDialogOpen} onOpenChange={setIsAnalysisDialogOpen}>
         <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col h-[80vh]">
           <DialogHeader>
             <DialogTitle className="font-headline text-xl flex items-center gap-2">
@@ -262,5 +315,34 @@ export default function PhotoAnalysis({ setAnalysisResult: setParentAnalysisResu
         </DialogContent>
       </Dialog>
     </Card>
+
+    <Dialog open={isCameraDialogOpen} onOpenChange={setIsCameraDialogOpen}>
+        <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-headline text-xl flex items-center gap-2">
+              <Video className="h-6 w-6 text-primary"/>
+              Take a Picture
+            </DialogTitle>
+            <DialogDescription>
+              Position the crop in the frame and capture a clear image.
+            </DialogDescription>
+          </DialogHeader>
+          <div className='my-4'>
+            <video ref={videoRef} className="w-full aspect-video rounded-md bg-muted" autoPlay muted playsInline />
+            {hasCameraPermission === false && (
+                <Alert variant="destructive" className="mt-4">
+                  <AlertTitle>Camera Access Required</AlertTitle>
+                  <AlertDescription>
+                    Please allow camera access in your browser to use this feature. You may need to refresh the page.
+                  </AlertDescription>
+                </Alert>
+            )}
+          </div>
+          <Button onClick={handleCapture} disabled={!hasCameraPermission}>
+            <CircleDot className="mr-2 h-4 w-4" /> Capture Photo
+          </Button>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -86,6 +86,7 @@
   "smartPhotoAnalysisDesc": "Upload a photo. I'll diagnose any issues and provide a treatment plan.",
   "imagePreview": "Image preview",
   "uploadPhoto": "Upload Photo",
+  "takePicture": "Take Picture",
   "useSample": "Use Sample",
   "analyzeCropHealth": "Analyze Crop Health",
   "noImage": "No Image",
