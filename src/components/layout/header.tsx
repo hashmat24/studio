@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Leaf, LogOut } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { Button } from '../ui/button';
-import { useAdmin } from '@/hooks/use-admin';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './language-switcher';
@@ -12,7 +11,6 @@ import { LanguageSwitcher } from './language-switcher';
 export default function Header() {
   const { t } = useTranslation();
   const { user, isUserLoading } = useUser();
-  const { isAdmin } = useAdmin();
   const auth = useAuth();
 
   const handleLogout = async () => {
@@ -40,10 +38,7 @@ export default function Header() {
             </Link>
             <Link
               href="/admin"
-              className={cn(
-                'transition-colors hover:text-foreground/80',
-                isAdmin ? 'text-foreground' : 'text-foreground/60'
-              )}
+              className="transition-colors hover:text-foreground/80 text-foreground"
             >
               {t('adminDashboard')}
             </Link>

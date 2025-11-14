@@ -1,32 +1,11 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useAdmin } from '@/hooks/use-admin';
-import { Loader2 } from 'lucide-react';
 import SystemStatus from './components/system-status';
 import UserManagement from './components/user-management';
 import AiPerformance from './components/ai-performance';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
-  const { isAdmin, isLoading } = useAdmin();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !isAdmin) {
-      router.push('/');
-    }
-  }, [isLoading, isAdmin, router]);
-
-  if (isLoading || !isAdmin) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        <p className="ml-4">{t('verifyingAccess')}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
