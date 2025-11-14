@@ -23,6 +23,7 @@ export type FarmerProfileData = {
 export default function Home() {
     const [advisoryItems, setAdvisoryItems] = useState<AdvisoryItem[] | null>(null);
     const [analysisResult, setAnalysisResult] = useState<SmartPhotoAnalysisForCropHealthOutput | null>(null);
+    const [refreshAdvisory, setRefreshAdvisory] = useState(0);
     const { user, isUserLoading } = useUser();
     const router = useRouter();
     const firestore = useFirestore();
@@ -54,8 +55,18 @@ export default function Home() {
       <DashboardHeader user={user} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         <div className="lg:col-span-2 space-y-6">
-          <HealthDashboard advisoryItems={advisoryItems} analysisResult={analysisResult} />
-          <RealTimeAdvisory setAdvisoryItems={setAdvisoryItems} farmerProfile={farmerProfile} />
+          <HealthDashboard 
+            advisoryItems={advisoryItems}
+            setAdvisoryItems={setAdvisoryItems}
+            analysisResult={analysisResult} 
+            farmerProfile={farmerProfile}
+            refreshAdvisory={refreshAdvisory}
+          />
+          <RealTimeAdvisory 
+            advisoryItems={advisoryItems} 
+            setAdvisoryItems={setAdvisoryItems} 
+            onRefresh={() => setRefreshAdvisory(c => c + 1)}
+          />
         </div>
         <div className="space-y-6">
           <CropProfile />
